@@ -29,6 +29,7 @@ class TaskView(BaseHandler):
         logger.info(f"Task name: {task.name}")
         logger.info(f"Task exception: {task.exception}")
         logger.info(f"Task exception (type): {type(task.exception)}")
+        logger.info(f"Task fields: {task._fields}")
         self.render("task.html", task=task)
 
 

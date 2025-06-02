@@ -14,19 +14,12 @@ class TaskView(BaseHandler):
     @web.authenticated
     def get(self, task_id):
         task = get_task_by_id(self.application.events, task_id)
-        logger.info(f"========== Task before format ==========")
-        logger.info(f"Task: {task}")
-        logger.info(f"Type of task: {type(task)}")
-        logger.info(f"========== Task before format ==========")
 
         if task is None:
             raise web.HTTPError(404, f"Unknown task '{task_id}'")
         task = self.format_task(task)
-        logger.info(f"========== Task after format ==========")
-        logger.info(f"Task: {task}")
-        logger.info(f"Type of task: {type(task)}")
-        logger.info(f"========== Task after format ==========")
 
+        logger.info(f"Get all task attributes: {task.__dict__}")
         logger.info(f"Task state: {task.state}")
         logger.info(f"Task result: {task.result}")
         logger.info(f"Task args: {task.args}")
@@ -34,6 +27,8 @@ class TaskView(BaseHandler):
         logger.info(f"Task traceback: {task.traceback}")
         logger.info(f"Task worker: {task.worker}")
         logger.info(f"Task name: {task.name}")
+        logger.info(f"Task exception: {task.exception}")
+        logger.info(f"Task exception (type): {type(task.exception)}")
         self.render("task.html", task=task)
 
 

@@ -87,6 +87,11 @@ class TasksDataTable(BaseHandler):
             filtered_tasks.append(task_dict)
 
         logger.info(f"Filtered tasks: {filtered_tasks}")
+        logger.info(f"Filtered tasks length: {len(filtered_tasks)}")
+        logger.info(f"Filtered task: {filtered_tasks[0]}")
+        logger.info(f"Filtered task type: {type(filtered_tasks[0])}")
+
+    
 
         self.write(dict(draw=draw, data=filtered_tasks,
                         recordsTotal=len(sorted_tasks),

@@ -85,6 +85,8 @@ class TasksDataTable(BaseHandler):
                 task_dict['worker'] = task_dict['worker'].hostname
 
             filtered_tasks.append(task_dict)
+            
+        logger.info(f"Filtered tasks: {filtered_tasks}")
 
         self.write(dict(draw=draw, data=filtered_tasks,
                         recordsTotal=len(sorted_tasks),

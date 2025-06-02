@@ -17,7 +17,6 @@
       <th>UUID</th>
       <th class="text-center">State</th>
       <th>args</th>
-      <th>service_type</th>
       <th>kwargs</th>
       <th>Result</th>
       <th class="text-center">Received</th>
@@ -43,7 +42,6 @@
       <td>{{ task.uuid }}</td>
       <td>{{ task.state }}</td>
       <td>{{ task.args }}</td>
-      <td>"asr_service"</td>
       <td>{{ task.kwargs }}</td>
       <td>
         {% if task.state == "SUCCESS" %}

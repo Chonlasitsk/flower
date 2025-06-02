@@ -84,6 +84,8 @@ class TasksDataTable(BaseHandler):
             if task_dict.get('worker'):
                 task_dict['worker'] = task_dict['worker'].hostname
 
+            task_dict['service_type'] = "asr_service"
+
             filtered_tasks.append(task_dict)
 
         logger.info(f"Filtered tasks: {filtered_tasks}")

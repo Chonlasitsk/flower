@@ -80,11 +80,12 @@ class TasksDataTable(BaseHandler):
         filtered_tasks = []
 
         for task in sorted_tasks[start:start + length]:
+            logger.info(f"Task: {task}")
             task_dict = as_dict(self.format_task(task)[1])
             if task_dict.get('worker'):
                 task_dict['worker'] = task_dict['worker'].hostname
 
-            task_dict['service_type'] = "asr_service"
+            # task_dict['service_type'] = "asr_service"
 
             filtered_tasks.append(task_dict)
 
@@ -144,5 +145,4 @@ class TasksView(BaseHandler):
             tasks=[],
             columns=app.options.tasks_columns,
             time=time,
-            service_type=service_type,
         )

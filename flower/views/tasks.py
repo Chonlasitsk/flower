@@ -85,7 +85,7 @@ class TasksDataTable(BaseHandler):
                 task_dict['worker'] = task_dict['worker'].hostname
 
             filtered_tasks.append(task_dict)
-            
+
         logger.info(f"Filtered tasks: {filtered_tasks}")
 
         self.write(dict(draw=draw, data=filtered_tasks,
@@ -130,9 +130,12 @@ class TasksView(BaseHandler):
         if capp.conf.timezone:
             time += '-' + str(capp.conf.timezone)
 
+        service_type = "asr_service"
+
         self.render(
             "tasks.html",
             tasks=[],
             columns=app.options.tasks_columns,
             time=time,
+            service_type=service_type,
         )

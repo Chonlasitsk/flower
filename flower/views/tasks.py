@@ -85,12 +85,9 @@ class TasksDataTable(BaseHandler):
             if task_dict.get('worker'):
                 task_dict['worker'] = task_dict['worker'].hostname
 
-            # task_dict['service_type'] = "asr_service"
 
             filtered_tasks.append(task_dict)
 
-        logger.info(f"Filtered tasks: {filtered_tasks}")
-        logger.info(f"Filtered tasks length: {len(filtered_tasks)}")
         logger.info(f"Filtered task: {filtered_tasks[0]}")
         logger.info(f"Filtered task type: {type(filtered_tasks[0])}")
 
@@ -134,11 +131,12 @@ class TasksView(BaseHandler):
         app = self.application
         capp = self.application.capp
 
+        logger.info(f"type of app: {type(app)}: {app}")
+        logger.info(f"type of capp: {type(capp)}: {capp}")
         time = 'natural-time' if app.options.natural_time else 'time'
         if capp.conf.timezone:
             time += '-' + str(capp.conf.timezone)
 
-        service_type = "asr_service"
 
         self.render(
             "tasks.html",

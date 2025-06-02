@@ -26,6 +26,14 @@ class TaskView(BaseHandler):
         logger.info(f"Task: {task}")
         logger.info(f"Type of task: {type(task)}")
         logger.info(f"========== Task after format ==========")
+
+        logger.info(f"Task state: {task.state}")
+        logger.info(f"Task result: {task.result}")
+        logger.info(f"Task args: {task.args}")
+        logger.info(f"Task kwargs: {task.kwargs}")
+        logger.info(f"Task traceback: {task.traceback}")
+        logger.info(f"Task worker: {task.worker}")
+        logger.info(f"Task name: {task.name}")
         self.render("task.html", task=task)
 
 

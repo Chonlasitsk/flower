@@ -559,9 +559,9 @@ var flower = (function () {
             order: [
                 [7, "desc"]
             ],
-            oSearch: {
-                "sSearch": $.urlParam('state') ? 'state:' + $.urlParam('state') : ''
-            },
+            // oSearch: {
+            //     "sSearch": $.urlParam('state') ? 'state:' + $.urlParam('state') : ''
+            // },
             columnDefs: [{
                 targets: 0,
                 data: 'name',

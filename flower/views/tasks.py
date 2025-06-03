@@ -19,17 +19,17 @@ class TaskView(BaseHandler):
             raise web.HTTPError(404, f"Unknown task '{task_id}'")
         task = self.format_task(task)
 
-        logger.info(f"Get all task attributes: {task.__dict__}")
-        logger.info(f"Task state: {task.state}")
-        logger.info(f"Task result: {task.result}")
-        logger.info(f"Task args: {task.args}")
-        logger.info(f"Task kwargs: {task.kwargs}")
-        logger.info(f"Task traceback: {task.traceback}")
-        logger.info(f"Task worker: {task.worker}")
-        logger.info(f"Task name: {task.name}")
-        logger.info(f"Task exception: {task.exception}")
-        logger.info(f"Task exception (type): {type(task.exception)}")
-        logger.info(f"Task fields: {task._fields}")
+        # logger.info(f"Get all task attributes: {task.__dict__}")
+        # logger.info(f"Task state: {task.state}")
+        # logger.info(f"Task result: {task.result}")
+        # logger.info(f"Task args: {task.args}")
+        # logger.info(f"Task kwargs: {task.kwargs}")
+        # logger.info(f"Task traceback: {task.traceback}")
+        # logger.info(f"Task worker: {task.worker}")
+        # logger.info(f"Task name: {task.name}")
+        # logger.info(f"Task exception: {task.exception}")
+        # logger.info(f"Task exception (type): {type(task.exception)}")
+        # logger.info(f"Task fields: {task._fields}")
         self.render("task.html", task=task)
 
 
@@ -131,8 +131,8 @@ class TasksView(BaseHandler):
         app = self.application
         capp = self.application.capp
 
-        logger.info(f"type of app: {type(app)}: {app}")
-        logger.info(f"type of capp: {type(capp)}: {capp}")
+        logger.info(f"type of app in TasksView: {type(app)}: {app}")
+        logger.info(f"type of capp in TasksView: {type(capp)}: {capp}")
         time = 'natural-time' if app.options.natural_time else 'time'
         if capp.conf.timezone:
             time += '-' + str(capp.conf.timezone)

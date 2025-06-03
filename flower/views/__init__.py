@@ -29,6 +29,9 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def render(self, *args, **kwargs):
         app_options = self.application.options
+        logger.info(f"app_options: {app_options}")
+        logger.info(f"type of app_options: {type(app_options)}")
+        logger.info(f"type of self.application in BaseHandler: {type(self.application)}")
         functions = inspect.getmembers(template, inspect.isfunction)
         assert not set(map(lambda x: x[0], functions)) & set(kwargs.keys())
         kwargs.update(functions)

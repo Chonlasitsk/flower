@@ -693,7 +693,15 @@ var flower = (function () {
                 targets: 17,
                 data: 'eta',
                 visible: isColumnVisible('eta')
-            }, ],
+            }, 
+        ],
+        initComplete: function () {
+            const stateFilter = $.urlParam('state');
+            if (stateFilter) {
+                this.api().column(2).search('^' + stateFilter + '$', true, false).draw();
+ 
+            }
+        }
         });
 
     });

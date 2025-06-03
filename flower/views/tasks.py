@@ -132,8 +132,6 @@ class TasksView(BaseHandler):
         app = self.application
         capp = self.application.capp
 
-        logger.info(f"type of app in TasksView: {type(app)}: {app}")
-        logger.info(f"type of capp in TasksView: {type(capp)}: {capp}")
         time = 'natural-time' if app.options.natural_time else 'time'
         if capp.conf.timezone:
             time += '-' + str(capp.conf.timezone)

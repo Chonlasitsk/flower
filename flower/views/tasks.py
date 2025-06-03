@@ -80,16 +80,17 @@ class TasksDataTable(BaseHandler):
         filtered_tasks = []
 
         for task in sorted_tasks[start:start + length]:
-            logger.info(f"Task: {task}")
+            # logger.info(f"Task: {task}")
             task_dict = as_dict(self.format_task(task)[1])
             if task_dict.get('worker'):
                 task_dict['worker'] = task_dict['worker'].hostname
 
+            task_dict['service_type'] = "asr_service"
 
             filtered_tasks.append(task_dict)
 
-        logger.info(f"Filtered task: {filtered_tasks[0]}")
-        logger.info(f"Filtered task type: {type(filtered_tasks[0])}")
+        # logger.info(f"Filtered task: {filtered_tasks[0]}")
+        # logger.info(f"Filtered task type: {type(filtered_tasks[0])}")
 
     
 

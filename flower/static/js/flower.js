@@ -594,6 +594,14 @@ var flower = (function () {
                     }
                 }
             }, {
+                targets: 2,
+                data: 'service_type',
+                visible: isColumnVisible('service_type'),
+                className: "text-nowrap",
+                render: function (data, type, full, meta) {
+                    return data;
+                }
+            }, {
                 targets: 3,
                 data: 'args',
                 className: "text-nowrap overflow-auto",

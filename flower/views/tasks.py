@@ -77,6 +77,11 @@ class TasksDataTable(BaseHandler):
             reverse=sort_order
         )
 
+        logger.info(f"search in TasksDataTable: {search}")
+        logger.info(f"column in TasksDataTable: {column}")
+        logger.info(f"sort_by in TasksDataTable: {sort_by}")
+        logger.info(f"sort_order in TasksDataTable: {sort_order}")
+
         filtered_tasks = []
 
         for task in sorted_tasks[start:start + length]:

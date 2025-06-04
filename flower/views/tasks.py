@@ -102,7 +102,6 @@ class TasksDataTable(BaseHandler):
 
         if len(filtered_tasks) > 0:
             logger.info(f"Filtered task: {filtered_tasks[0]}")
-            logger.info(f"json of filtered task: {json.dumps(filtered_tasks[0], ensure_ascii=False, indent=2)}")
 
         self.write(dict(draw=draw, data=filtered_tasks,
                         recordsTotal=len(sorted_tasks),
@@ -133,6 +132,7 @@ class TasksDataTable(BaseHandler):
                 args = custom_format_task(copy.copy(args))
             except Exception:
                 logger.exception("Failed to format '%s' task", uuid)
+        logger.info(f"json of filtered task: {json.dumps(args.args, ensure_ascii=False, indent=2)}")
         return uuid, args
 
 

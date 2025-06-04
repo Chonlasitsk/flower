@@ -79,38 +79,23 @@ class TasksDataTable(BaseHandler):
             key=key,
             reverse=sort_order
         )
+        logger.info(f"Number of sorted tasks: {len(sorted_tasks)}")
 
+        #NOTE filter tasks by state
+        if filter_state:
+            logger.info(f"Filtering tasks by state: {filter_state}")
+            pattern = re.compile(filter_state)
+            sorted_tasks = [task for task in sorted_tasks if pattern.match(task[1].state)]
+            logger.info(f"Number of filtered tasks by state: {len(sorted_tasks)}")
 
         filtered_tasks = []
-
         for task in sorted_tasks[start:start + length]:
             logger.info(f"Task: {task}")
             task_dict = as_dict(self.format_task(task)[1])
             if task_dict.get('worker'):
                 task_dict['worker'] = task_dict['worker'].hostname
-
             task_dict['service_type'] = "asr_service"
-
             filtered_tasks.append(task_dict)
-        
-        logger.info(f"Number of filtered tasks: {len(filtered_tasks)}")
-        logger.info(f"length : {length}")
-
-        if filter_state:
-            logger.info(f"Filter state: {filter_state}")
-            pattern = re.compile(filter_state)
-            all_filtered_tasks_by_state = [task for task in sorted_tasks if pattern.match(task[1].state)]
-            filtered_task_state = []
-            for task in all_filtered_tasks_by_state[start:start + length]:
-                logger.info(f"Task with state {filter_state}: {task}")
-                task_dict = as_dict(self.format_task(task)[1])
-                if task_dict.get('worker'):
-                    task_dict['worker'] = task_dict['worker'].hostname
-                task_dict['service_type'] = 'asr_service'
-                filtered_task_state.append(task_dict)
-
-            logger.info(f"Number of filtered tasks by state: {len(filtered_task_state)}")
-            filtered_tasks = filtered_task_state
 
         self.write(dict(draw=draw, data=filtered_tasks,
                         recordsTotal=len(sorted_tasks),
@@ -156,9 +141,11 @@ class TasksView(BaseHandler):
 
         logger.info(f"tasks_columns: {app.options.tasks_columns}")
         logger.info(f"type of tasks_columns: {type(app.options.tasks_columns)}")
+        show_columns = app.options.tasks_columns + ',service_type' + ',target'
+
         self.render(
             "tasks.html",
             tasks=[],
-            columns="all",
+            columns=show_columns, #NOTE define which columns to display in UI ex. 'all' -> show all columns
             time=time,
         )

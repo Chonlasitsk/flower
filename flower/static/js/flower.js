@@ -552,21 +552,21 @@ var flower = (function () {
                 info: 'Showing _START_ to _END_ of _TOTAL_ tasks',
                 infoFiltered: '(filtered from _MAX_ total tasks)'
             },
-            // ajax: {
-            //     type: 'POST',
-            //     url: url_prefix() + '/tasks/datatable'
-            // },
             ajax: {
                 type: 'POST',
-                url: url_prefix() + '/tasks/datatable',
-                data: function (d) {
-                    const stateFilter = $.urlParam('state');
-                    if (stateFilter) {
-                        d.columns[2].search.value = '^' + stateFilter + '$';
-                        d.columns[2].search.regex = true;
-                    }
-                }
+                url: url_prefix() + '/tasks/datatable'
             },
+            // ajax: {
+            //     type: 'POST',
+            //     url: url_prefix() + '/tasks/datatable',
+            //     data: function (d) {
+            //         const stateFilter = $.urlParam('state');
+            //         if (stateFilter) {
+            //             d.columns[2].search.value = '^' + stateFilter + '$';
+            //             d.columns[2].search.regex = true;
+            //         }
+            //     }
+            // },
             order: [
                 [7, "desc"]
             ],

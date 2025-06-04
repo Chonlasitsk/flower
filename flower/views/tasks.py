@@ -154,7 +154,7 @@ class TasksView(BaseHandler):
         if capp.conf.timezone:
             time += '-' + str(capp.conf.timezone)
 
-
+        logger.info(f"tasks_columns: {app.options.tasks_columns}")
         self.render(
             "tasks.html",
             tasks=[],

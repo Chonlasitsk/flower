@@ -80,7 +80,6 @@ class TasksDataTable(BaseHandler):
         logger.info(f"search in TasksDataTable: {search}")
         logger.info(f"column in TasksDataTable: {column}")
         logger.info(f"sort_by in TasksDataTable: {sort_by}")
-        logger.info(f"sort_order in TasksDataTable: {sort_order}")
 
         filtered_tasks = []
 
@@ -93,10 +92,10 @@ class TasksDataTable(BaseHandler):
             task_dict['service_type'] = "asr_service"
 
             filtered_tasks.append(task_dict)
-
-        # logger.info(f"Filtered task: {filtered_tasks[0]}")
-        # logger.info(f"Filtered task type: {type(filtered_tasks[0])}")
-
+        if len(filtered_tasks) > 0:
+            filtered_task = filtered_tasks[0]
+            logger.info(f"Filtered task: {filtered_task}")
+            logger.info(f"Filtered task state: {filtered_task['state']}")
     
 
         self.write(dict(draw=draw, data=filtered_tasks,

@@ -1,6 +1,7 @@
 import copy
 import logging
 from functools import total_ordering
+import re
 
 from tornado import web
 
@@ -79,11 +80,6 @@ class TasksDataTable(BaseHandler):
             reverse=sort_order
         )
 
-        logger.info(f"search in TasksDataTable: {search}")
-        logger.info(f"column in TasksDataTable: {column}")
-        logger.info(f"sort_by in TasksDataTable: {sort_by}")
-        logger.info(f"filter_state in TasksDataTable: {filter_state}")
-        logger.info(f"Type of filter_state: {type(filter_state)}")
 
         filtered_tasks = []
 
@@ -96,11 +92,13 @@ class TasksDataTable(BaseHandler):
             task_dict['service_type'] = "asr_service"
 
             filtered_tasks.append(task_dict)
-        if len(filtered_tasks) > 0:
-            filtered_task = filtered_tasks[0]
-            logger.info(f"Filtered task state: {filtered_task['state']}")
-    
 
+        if filter_state:
+            logger.info(f"Filter state: {filter_state}")
+            pattern = re.compile(filter_state)
+            filtered_tasks_by_state = [task for task in filtered_tasks if pattern.match(task['state'])]
+            logger.info(f"Filtered tasks by state: {filtered_tasks_by_state}")
+            
         self.write(dict(draw=draw, data=filtered_tasks,
                         recordsTotal=len(sorted_tasks),
                         recordsFiltered=len(sorted_tasks)))

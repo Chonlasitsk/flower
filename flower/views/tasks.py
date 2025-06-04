@@ -92,7 +92,10 @@ class TasksDataTable(BaseHandler):
             task_dict['service_type'] = "asr_service"
 
             filtered_tasks.append(task_dict)
-
+        
+        logger.info(f"Number of filtered tasks: {len(filtered_tasks)}")
+        logger.info(f"length : {length}")
+        
         if filter_state:
             logger.info(f"Filter state: {filter_state}")
             pattern = re.compile(filter_state)

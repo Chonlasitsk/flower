@@ -2,6 +2,8 @@ import copy
 import logging
 from functools import total_ordering
 import re
+import ast
+import json
 
 from tornado import web
 
@@ -95,11 +97,12 @@ class TasksDataTable(BaseHandler):
             if task_dict.get('worker'):
                 task_dict['worker'] = task_dict['worker'].hostname
             task_dict['service'] = "asr_service"
-            task_dict['upstream'] = "asr_upstream"
+            task_dict['upstream'] = ast.literal_eval(task_dict['result'])['target']
             filtered_tasks.append(task_dict)
 
         if len(filtered_tasks) > 0:
             logger.info(f"Filtered task: {filtered_tasks[0]}")
+            logger.info(f"json of filtered task: {json.dumps(filtered_tasks[0], ensure_ascii=False, indent=2)}")
 
         self.write(dict(draw=draw, data=filtered_tasks,
                         recordsTotal=len(sorted_tasks),

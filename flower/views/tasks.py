@@ -98,7 +98,6 @@ class TasksDataTable(BaseHandler):
             filtered_tasks.append(task_dict)
         if len(filtered_tasks) > 0:
             filtered_task = filtered_tasks[0]
-            logger.info(f"Filtered task: {filtered_task}")
             logger.info(f"Filtered task state: {filtered_task['state']}")
     
 

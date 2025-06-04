@@ -559,9 +559,9 @@ var flower = (function () {
             order: [
                 [7, "desc"]
             ],
-            oSearch: {
-                "sSearch": $.urlParam('state') ? 'state:' + $.urlParam('state') : ''
-            },
+            // oSearch: {
+            //     "sSearch": $.urlParam('state') ? 'state:' + $.urlParam('state') : ''
+            // },
             columnDefs: [{
                 targets: 0,
                 data: 'name',
@@ -695,13 +695,13 @@ var flower = (function () {
                 visible: isColumnVisible('eta')
             }, 
         ],
-        // initComplete: function () {
-        //     const stateFilter = $.urlParam('state');
-        //     if (stateFilter) {
-        //         this.api().column(2).search('^' + stateFilter + '$', true, false).draw();
+        initComplete: function () {
+            const stateFilter = $.urlParam('state');
+            if (stateFilter) {
+                this.api().column(2).search('^' + stateFilter + '$', true, false).draw();
  
-        //     }
-        // }
+            }
+        }
         });
 
     });

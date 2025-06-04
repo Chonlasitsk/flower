@@ -159,6 +159,6 @@ class TasksView(BaseHandler):
         self.render(
             "tasks.html",
             tasks=[],
-            columns=app.options.tasks_columns,
+            columns="all",
             time=time,
         )

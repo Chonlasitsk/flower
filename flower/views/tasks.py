@@ -97,8 +97,9 @@ class TasksDataTable(BaseHandler):
             logger.info(f"Filter state: {filter_state}")
             pattern = re.compile(filter_state)
             filtered_tasks_by_state = [task for task in filtered_tasks if pattern.match(task['state'])]
-            logger.info(f"Filtered tasks by state: {filtered_tasks_by_state}")
-            
+            logger.info(f"Number of filtered tasks by state: {len(filtered_tasks_by_state)}")
+            filtered_tasks = filtered_tasks_by_state
+
         self.write(dict(draw=draw, data=filtered_tasks,
                         recordsTotal=len(sorted_tasks),
                         recordsFiltered=len(sorted_tasks)))

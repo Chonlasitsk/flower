@@ -84,7 +84,7 @@ class TasksDataTable(BaseHandler):
         filtered_tasks = []
 
         for task in sorted_tasks[start:start + length]:
-            # logger.info(f"Task: {task}")
+            logger.info(f"Task: {task}")
             task_dict = as_dict(self.format_task(task)[1])
             if task_dict.get('worker'):
                 task_dict['worker'] = task_dict['worker'].hostname
@@ -95,13 +95,21 @@ class TasksDataTable(BaseHandler):
         
         logger.info(f"Number of filtered tasks: {len(filtered_tasks)}")
         logger.info(f"length : {length}")
-        
+
         if filter_state:
             logger.info(f"Filter state: {filter_state}")
             pattern = re.compile(filter_state)
-            filtered_tasks_by_state = [task for task in filtered_tasks if pattern.match(task['state'])]
-            logger.info(f"Number of filtered tasks by state: {len(filtered_tasks_by_state)}")
-            filtered_tasks = filtered_tasks_by_state
+            all_filtered_tasks_by_state = [task for task in sorted_tasks if pattern.match(task[1].state)]
+            filtered_task_state = []
+            for task in all_filtered_tasks_by_state[start:start + length]:
+                task_dict = as_dict(self.format_task(task)[1])
+                if task_dict.get('worker'):
+                    task_dict['worker'] = task_dict['worker'].hostname
+                task_dict['service_type'] = 'asr_service'
+                filtered_task_state.append(task_dict)
+
+            logger.info(f"Number of filtered tasks by state: {len(filtered_task_state)}")
+            filtered_tasks = filtered_task_state
 
         self.write(dict(draw=draw, data=filtered_tasks,
                         recordsTotal=len(sorted_tasks),

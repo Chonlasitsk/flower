@@ -94,9 +94,11 @@ class TasksDataTable(BaseHandler):
             task_dict = as_dict(self.format_task(task)[1])
             if task_dict.get('worker'):
                 task_dict['worker'] = task_dict['worker'].hostname
-            task_dict['service_type'] = "asr_service"
+            task_dict['service'] = "asr_service"
+            task_dict['upstream'] = "asr_upstream"
             filtered_tasks.append(task_dict)
-
+        logger.info(f"Filtered task: {filtered_tasks[0]}")
+        
         self.write(dict(draw=draw, data=filtered_tasks,
                         recordsTotal=len(sorted_tasks),
                         recordsFiltered=len(sorted_tasks)))

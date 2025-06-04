@@ -66,6 +66,8 @@ class TasksDataTable(BaseHandler):
         sort_by = self.get_argument(f'columns[{column}][data]', type=str)
         sort_order = self.get_argument('order[0][dir]', type=str) == 'desc'
 
+        filter_state = self.get_argument('columns[2][search][value]', type=str)
+
         def key(item):
             return Comparable(getattr(item[1], sort_by))
 
@@ -80,6 +82,8 @@ class TasksDataTable(BaseHandler):
         logger.info(f"search in TasksDataTable: {search}")
         logger.info(f"column in TasksDataTable: {column}")
         logger.info(f"sort_by in TasksDataTable: {sort_by}")
+        logger.info(f"filter_state in TasksDataTable: {filter_state}")
+        logger.info(f"Type of filter_state: {type(filter_state)}")
 
         filtered_tasks = []
 

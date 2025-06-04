@@ -552,9 +552,20 @@ var flower = (function () {
                 info: 'Showing _START_ to _END_ of _TOTAL_ tasks',
                 infoFiltered: '(filtered from _MAX_ total tasks)'
             },
+            // ajax: {
+            //     type: 'POST',
+            //     url: url_prefix() + '/tasks/datatable'
+            // },
             ajax: {
                 type: 'POST',
-                url: url_prefix() + '/tasks/datatable'
+                url: url_prefix() + '/tasks/datatable',
+                data: function (d) {
+                    const stateFilter = $.urlParam('state');
+                    if (stateFilter) {
+                        d.columns[2].search.value = '^' + stateFilter + '$';
+                        d.columns[2].search.regex = true;
+                    }
+                }
             },
             order: [
                 [7, "desc"]
@@ -695,13 +706,13 @@ var flower = (function () {
                 visible: isColumnVisible('eta')
             }, 
         ],
-        initComplete: function () {
-            const stateFilter = $.urlParam('state');
-            if (stateFilter) {
-                this.api().column(2).search('^' + stateFilter + '$', true, false).draw();
+        // initComplete: function () {
+        //     const stateFilter = $.urlParam('state');
+        //     if (stateFilter) {
+        //         this.api().column(2).search('^' + stateFilter + '$', true, false).draw();
  
-            }
-        }
+        //     }
+        // }
         });
 
     });

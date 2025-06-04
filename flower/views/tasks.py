@@ -102,6 +102,7 @@ class TasksDataTable(BaseHandler):
             all_filtered_tasks_by_state = [task for task in sorted_tasks if pattern.match(task[1].state)]
             filtered_task_state = []
             for task in all_filtered_tasks_by_state[start:start + length]:
+                logger.info(f"Task with state {filter_state}: {task}")
                 task_dict = as_dict(self.format_task(task)[1])
                 if task_dict.get('worker'):
                     task_dict['worker'] = task_dict['worker'].hostname

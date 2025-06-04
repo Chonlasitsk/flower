@@ -98,7 +98,7 @@ class TasksDataTable(BaseHandler):
             task_dict['upstream'] = "asr_upstream"
             filtered_tasks.append(task_dict)
         logger.info(f"Filtered task: {filtered_tasks[0]}")
-        
+
         self.write(dict(draw=draw, data=filtered_tasks,
                         recordsTotal=len(sorted_tasks),
                         recordsFiltered=len(sorted_tasks)))
@@ -143,7 +143,7 @@ class TasksView(BaseHandler):
 
         logger.info(f"tasks_columns: {app.options.tasks_columns}")
         logger.info(f"type of tasks_columns: {type(app.options.tasks_columns)}")
-        show_columns = app.options.tasks_columns + ',service_type' + ',target'
+        show_columns = app.options.tasks_columns + ',service' + ',upstream'
 
         self.render(
             "tasks.html",

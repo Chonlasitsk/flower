@@ -19,7 +19,10 @@ class TaskView(BaseHandler):
         if task is None:
             raise web.HTTPError(404, f"Unknown task '{task_id}'")
         task = self.format_task(task)
-        logger.debug(f"task: {task}")
+        
+        task_from_redis = self.application.redis_client.get_task_by_id(task_id)
+        logger.debug(f"task_from_redis: {task_from_redis}")
+        logger.debug(f"task_from_events: {task}")
         self.render("task.html", task=task)
 
 

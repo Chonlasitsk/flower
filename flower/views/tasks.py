@@ -96,7 +96,7 @@ class TasksDataTable(BaseHandler):
                 task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
             elif task_dict['state'] == 'FAILURE':
                 task_dict['service'] = task_from_redis['result']['exc_message'][0]['exc_data']['service']
-                task_dict['upstream'] = task_from_redis['result']['exc_message'][0]['exc_data']['upstream_url'] if task_from_redis['result']['exc_message'][0]['exc_data']['upstream_url'] else task_from_redis['result']['exc_message'][0]['exc_data']['upstream_url']
+                task_dict['upstream'] = task_from_redis['result']['exc_message'][0]['exc_data']['target'] if task_from_redis['result']['exc_message'][0]['exc_data']['target'] else task_from_redis['result']['exc_message'][0]['exc_data']['upstream_url']
 
             filtered_tasks.append(task_dict)
 

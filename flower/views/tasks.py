@@ -88,8 +88,8 @@ class TasksDataTable(BaseHandler):
         tasks_from_redis_dict = [json.loads(task) for task in tasks_from_redis]
 
         for idx, task in enumerate(sorted_tasks[start:start + length]):
-            logger.debug(f"Task: {task} :: {task_ids[idx]}")
             task_dict = as_dict(self.format_task(task)[1])
+            logger.debug(f"task_dict: {task_dict}")
             if task_dict.get('worker'):
                 task_dict['worker'] = task_dict['worker'].hostname
             task_dict['service'] = "asr_service"

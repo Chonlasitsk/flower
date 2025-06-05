@@ -117,8 +117,6 @@ class TasksDataTable(BaseHandler):
     def format_task(self, task):
         uuid, args = task
         custom_format_task = self.application.options.format_task
-        full_args = getattr(args, 'args', None)
-        logger.debug(f"full_args: {full_args}")
         if custom_format_task:
             try:
                 args = custom_format_task(copy.copy(args))

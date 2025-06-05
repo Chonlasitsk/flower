@@ -3,7 +3,6 @@ import logging
 from functools import total_ordering
 import re
 import ast
-import json
 
 from tornado import web
 
@@ -20,9 +19,7 @@ class TaskView(BaseHandler):
         if task is None:
             raise web.HTTPError(404, f"Unknown task '{task_id}'")
         task = self.format_task(task)
-        task_dict = as_dict(task)
-        logger.debug(f"task_dict: {json.dumps(task_dict, ensure_ascii=False, indent=2)}")
-
+        logger.debug(f"task: {task}")
         self.render("task.html", task=task)
 
 
@@ -71,14 +68,14 @@ class TasksDataTable(BaseHandler):
             key=key,
             reverse=sort_order
         )
-        logger.info(f"Number of sorted tasks: {len(sorted_tasks)}")
+        logger.debug(f"Number of sorted tasks: {len(sorted_tasks)}")
 
         #NOTE filter tasks by state
         if filter_state:
-            logger.info(f"Filtering tasks by state: {filter_state}")
+            logger.debug(f"Filtering tasks by state: {filter_state}")
             pattern = re.compile(filter_state)
             sorted_tasks = [task for task in sorted_tasks if pattern.match(task[1].state)]
-            logger.info(f"Number of filtered tasks by state: {len(sorted_tasks)}")
+            logger.debug(f"Number of filtered tasks by state: {len(sorted_tasks)}")
 
         filtered_tasks = []
         for task in sorted_tasks[start:start + length]:
@@ -92,8 +89,6 @@ class TasksDataTable(BaseHandler):
                 task_dict['upstream'] = "unknown"
             filtered_tasks.append(task_dict)
 
-        if len(filtered_tasks) > 0:
-            logger.info(f"Filtered task: {filtered_tasks[0]}")
 
         self.write(dict(draw=draw, data=filtered_tasks,
                         recordsTotal=len(sorted_tasks),
@@ -136,8 +131,8 @@ class TasksView(BaseHandler):
         if capp.conf.timezone:
             time += '-' + str(capp.conf.timezone)
 
-        logger.info(f"tasks_columns: {app.options.tasks_columns}")
-        logger.info(f"type of tasks_columns: {type(app.options.tasks_columns)}")
+        logger.debug(f"tasks_columns: {app.options.tasks_columns}")
+        logger.debug(f"type of tasks_columns: {type(app.options.tasks_columns)}")
         show_columns = app.options.tasks_columns + ',service' + ',upstream'
 
         self.render(

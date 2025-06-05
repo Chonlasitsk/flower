@@ -92,12 +92,14 @@ class TasksDataTable(BaseHandler):
 
         filtered_tasks = []
         for task in sorted_tasks[start:start + length]:
-            logger.info(f"Task: {task}")
             task_dict = as_dict(self.format_task(task)[1])
             if task_dict.get('worker'):
                 task_dict['worker'] = task_dict['worker'].hostname
             task_dict['service'] = "asr_service"
-            task_dict['upstream'] = ast.literal_eval(task_dict['result'])['target']
+            if task_dict['state'] == 'SUCCESS':
+                task_dict['upstream'] = ast.literal_eval(task_dict['result'])['target']
+            else:
+                task_dict['upstream'] = "unknown"
             filtered_tasks.append(task_dict)
 
         if len(filtered_tasks) > 0:
@@ -132,7 +134,6 @@ class TasksDataTable(BaseHandler):
                 args = custom_format_task(copy.copy(args))
             except Exception:
                 logger.exception("Failed to format '%s' task", uuid)
-        logger.info(f"json of filtered task: {json.dumps(args.args, ensure_ascii=False, indent=2)}")
         return uuid, args
 
 

@@ -17,10 +17,11 @@ class TaskView(BaseHandler):
     @web.authenticated
     def get(self, task_id):
         task = get_task_by_id(self.application.events, task_id)
-        logger.debug(f"task: {json.dumps(task, ensure_ascii=False, indent=2)}")
         if task is None:
             raise web.HTTPError(404, f"Unknown task '{task_id}'")
         task = self.format_task(task)
+        task_dict = as_dict(task)
+        logger.debug(f"task_dict: {json.dumps(task_dict, ensure_ascii=False, indent=2)}")
 
         self.render("task.html", task=task)
 
@@ -63,7 +64,7 @@ class TasksDataTable(BaseHandler):
         def key(item):
             return Comparable(getattr(item[1], sort_by))
 
-        self.maybe_normalize_for_sort(app.events.state.tasks_by_timestamp(), sort_by)
+        self.maybe_normalize_fxor_sort(app.events.state.tasks_by_timestamp(), sort_by)
 
         sorted_tasks = sorted(
             iter_tasks(app.events, search=search),

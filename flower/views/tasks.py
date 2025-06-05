@@ -3,6 +3,7 @@ import logging
 from functools import total_ordering
 import re
 import ast
+import json
 
 from tornado import web
 
@@ -19,7 +20,7 @@ class TaskView(BaseHandler):
         if task is None:
             raise web.HTTPError(404, f"Unknown task '{task_id}'")
         task = self.format_task(task)
-        
+
         task_from_redis = self.application.redis_client.get_task_by_id(task_id)
         logger.debug(f"task_from_redis: {task_from_redis}")
         logger.debug(f"task_from_events: {task}")
@@ -81,7 +82,14 @@ class TasksDataTable(BaseHandler):
             logger.debug(f"Number of filtered tasks by state: {len(sorted_tasks)}")
 
         filtered_tasks = []
-        for task in sorted_tasks[start:start + length]:
+        logger.debug(f"type of uuids: {type(sorted_tasks[0][0])}")
+        task_ids = [task[0] for task in sorted_tasks[start:start + length]]
+        tasks_from_redis = self.application.redis_client.get_tasks_by_id(task_ids)
+        tasks_from_redis_dict = [json.loads(task) for task in tasks_from_redis]
+        logger.debug(f"tasks_from_redis: {tasks_from_redis_dict}")
+
+        for idx, task in enumerate(sorted_tasks[start:start + length]):
+            logger.debug(f"Task: {task} :: {task_ids[idx]}")
             task_dict = as_dict(self.format_task(task)[1])
             if task_dict.get('worker'):
                 task_dict['worker'] = task_dict['worker'].hostname

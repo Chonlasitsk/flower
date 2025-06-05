@@ -22,17 +22,6 @@ class TaskView(BaseHandler):
             raise web.HTTPError(404, f"Unknown task '{task_id}'")
         task = self.format_task(task)
 
-        # logger.info(f"Get all task attributes: {task.__dict__}")
-        # logger.info(f"Task state: {task.state}")
-        # logger.info(f"Task result: {task.result}")
-        # logger.info(f"Task args: {task.args}")
-        # logger.info(f"Task kwargs: {task.kwargs}")
-        # logger.info(f"Task traceback: {task.traceback}")
-        # logger.info(f"Task worker: {task.worker}")
-        # logger.info(f"Task name: {task.name}")
-        # logger.info(f"Task exception: {task.exception}")
-        # logger.info(f"Task exception (type): {type(task.exception)}")
-        # logger.info(f"Task fields: {task._fields}")
         self.render("task.html", task=task)
 
 
@@ -128,10 +117,8 @@ class TasksDataTable(BaseHandler):
     def format_task(self, task):
         uuid, args = task
         custom_format_task = self.application.options.format_task
-        result = getattr(args, 'result', None)
-        meta = getattr(args, 'meta', None)
-        logger.debug(f"result: {result}")
-        logger.debug(f"meta: {meta}")
+        full_args = getattr(args, 'args', None)
+        logger.debug(f"full_args: {full_args}")
         if custom_format_task:
             try:
                 args = custom_format_task(copy.copy(args))

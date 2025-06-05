@@ -82,21 +82,22 @@ class TasksDataTable(BaseHandler):
             logger.debug(f"Number of filtered tasks by state: {len(sorted_tasks)}")
 
         filtered_tasks = []
-        logger.debug(f"type of uuids: {type(sorted_tasks[0][0])}")
         task_ids = [task[0] for task in sorted_tasks[start:start + length]]
         tasks_from_redis = self.application.redis_client.get_tasks_by_id(task_ids)
         tasks_from_redis_dict = [json.loads(task) for task in tasks_from_redis]
 
-        for idx, task in enumerate(sorted_tasks[start:start + length]):
+        for task, task_from_redis in zip(sorted_tasks[start:start + length], tasks_from_redis_dict):
             task_dict = as_dict(self.format_task(task)[1])
-            logger.debug(f"task_dict: {task_dict}")
             if task_dict.get('worker'):
                 task_dict['worker'] = task_dict['worker'].hostname
-            task_dict['service'] = "asr_service"
+
             if task_dict['state'] == 'SUCCESS':
-                task_dict['upstream'] = ast.literal_eval(task_dict['result'])['target']
-            else:
-                task_dict['upstream'] = "unknown"
+                task_dict['service'] = task_from_redis['result']['service']
+                task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
+            elif task_dict['state'] == 'FAILURE':
+                task_dict['service'] = task_from_redis['result']['exc_message'][0]['exc_data']['service']
+                task_dict['upstream'] = task_from_redis['result']['exc_message'][0]['exc_data']['upstream_url'] if task_from_redis['result']['exc_message'][0]['exc_data']['upstream_url'] else task_from_redis['result']['exc_message'][0]['exc_data']['upstream_url']
+
             filtered_tasks.append(task_dict)
 
 

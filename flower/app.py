@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 import celery
 import tornado.web
 
+import redis
 from tornado import ioloop
 from tornado.httpserver import HTTPServer
 from tornado.web import url
@@ -14,6 +15,7 @@ from .urls import handlers as default_handlers
 from .events import Events
 from .inspector import Inspector
 from .options import default_options
+from .utils.broker import Redis
 
 
 logger = logging.getLogger(__name__)
@@ -29,6 +31,7 @@ def rewrite_handler(handler, url_prefix):
         return url("/{}{}".format(url_prefix.strip("/"), handler.regex.pattern),
                    handler.handler_class, handler.kwargs, handler.name)
     return ("/{}{}".format(url_prefix.strip("/"), handler[0]), handler[1])
+
 
 
 class Flower(tornado.web.Application):
@@ -64,6 +67,7 @@ class Flower(tornado.web.Application):
             max_workers_in_memory=self.options.max_workers,
             max_tasks_in_memory=self.options.max_tasks)
         self.started = False
+        logger.debug(f"broker_api: {self.options.broker_api}")
 
     def start(self):
         self.events.start()

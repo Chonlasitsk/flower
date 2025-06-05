@@ -151,7 +151,18 @@ class Redis(RedisBase):
         }
 
     def _get_redis_client(self):
+        logger.debug(f"connecting to redis with config: {self._get_redis_client_args()}")
         return redis.Redis(**self._get_redis_client_args())
+    
+    def get_task_by_id(self, task_id):
+        prefix = "celery-task-meta"
+        key = f"{prefix}-{task_id}"
+        return self.redis.get(key)
+    
+    def get_tasks_by_id(self, task_ids):
+        prefix = "celery-task-meta"
+        keys = [f"{prefix}-{task_id}" for task_id in task_ids]
+        return self.redis.mget(keys)
 
 
 class RedisSentinel(RedisBase):

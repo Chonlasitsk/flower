@@ -17,7 +17,7 @@ class TaskView(BaseHandler):
     @web.authenticated
     def get(self, task_id):
         task = get_task_by_id(self.application.events, task_id)
-
+        logger.debug(f"task: {json.dumps(task, ensure_ascii=False, indent=2)}")
         if task is None:
             raise web.HTTPError(404, f"Unknown task '{task_id}'")
         task = self.format_task(task)

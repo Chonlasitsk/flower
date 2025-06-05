@@ -67,7 +67,7 @@ class Flower(tornado.web.Application):
             max_workers_in_memory=self.options.max_workers,
             max_tasks_in_memory=self.options.max_tasks)
         self.started = False
-        logger.debug(f"broker_api: {self.options.broker_api}")
+        logger.debug(f"broker_api: {self.capp.connection().as_uri()}")
 
     def start(self):
         self.events.start()

@@ -13,7 +13,8 @@ def iter_tasks(events, limit=None, offset=0, type=None, worker=None, state=None,
     i = 0
     tasks = events.state.tasks_by_timestamp()
     logger.debug(f"tasks: {tasks}")
-    logger.debug(f"tasks[1].args: {tasks[1].args}")
+    uuids, taskk = next(tasks)
+    logger.debug(f"tasks.args: {taskk.args}")
     if sort_by is not None:
         tasks = sort_tasks(tasks, sort_by)
 

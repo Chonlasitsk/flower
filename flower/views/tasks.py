@@ -64,7 +64,7 @@ class TasksDataTable(BaseHandler):
         def key(item):
             return Comparable(getattr(item[1], sort_by))
 
-        self.maybe_normalize_fxor_sort(app.events.state.tasks_by_timestamp(), sort_by)
+        self.maybe_normalize_for_sort(app.events.state.tasks_by_timestamp(), sort_by)
 
         sorted_tasks = sorted(
             iter_tasks(app.events, search=search),

@@ -604,6 +604,7 @@ var flower = (function () {
             }, {
                 targets: 3,
                 data: 'service',
+                orderable: false,
                 visible: isColumnVisible('service'),
                 className: "text-nowrap",
                 render: function (data, type, full, meta) {
@@ -612,6 +613,7 @@ var flower = (function () {
             }, {
                 targets: 4,
                 data: 'upstream',
+                orderable: false,
                 visible: isColumnVisible('upstream'),
                 className: "text-nowrap",
                 render: function (data, type, full, meta) {

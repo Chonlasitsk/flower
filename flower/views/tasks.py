@@ -93,7 +93,7 @@ class TasksDataTable(BaseHandler):
                 task_dict['worker'] = task_dict['worker'].hostname
 
             if task_dict['state'] == 'STARTED':
-                if task_from_redis['PROCESSING']:
+                if task_from_redis['status'] == 'PROCESSING':
                     task_dict['service'] = task_from_redis['result']['service']
                     task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
                 else:

@@ -21,9 +21,8 @@ class TaskView(BaseHandler):
             raise web.HTTPError(404, f"Unknown task '{task_id}'")
         task = self.format_task(task)
 
-        task_from_redis = self.application.redis_client.get_task_by_id(task_id)
-        task_from_redis_dict = json.loads(task_from_redis)
-        logger.debug(f"task_from_redis: {task_from_redis_dict}")
+        # task_from_redis = self.application.redis_client.get_task_by_id(task_id)
+        # task_from_redis_dict = json.loads(task_from_redis)
         self.render("task.html", task=task)
 
 
@@ -142,8 +141,6 @@ class TasksView(BaseHandler):
         if capp.conf.timezone:
             time += '-' + str(capp.conf.timezone)
 
-        logger.debug(f"tasks_columns: {app.options.tasks_columns}")
-        logger.debug(f"type of tasks_columns: {type(app.options.tasks_columns)}")
         show_columns = app.options.tasks_columns + ',service' + ',upstream'
 
         self.render(

@@ -20,7 +20,7 @@ class TaskView(BaseHandler):
         if task is None:
             raise web.HTTPError(404, f"Unknown task '{task_id}'")
         task = self.format_task(task)
-
+        logger.debug(f"task: {task}")
         # task_from_redis = self.application.redis_client.get_task_by_id(task_id)
         # task_from_redis_dict = json.loads(task_from_redis)
         self.render("task.html", task=task)
@@ -80,12 +80,13 @@ class TasksDataTable(BaseHandler):
             sorted_tasks = [task for task in sorted_tasks if pattern.match(task[1].state)]
             logger.debug(f"Number of filtered tasks by state: {len(sorted_tasks)}")
 
+        sorted_tasks_paginated = sorted_tasks[start:start + length]
         filtered_tasks = []
-        task_ids = [task[0] for task in sorted_tasks[start:start + length]]
+        task_ids = [task[0] for task in sorted_tasks_paginated]
         tasks_from_redis = self.application.redis_client.get_tasks_by_id(task_ids)
         tasks_from_redis_dict = [json.loads(task) for task in tasks_from_redis]
 
-        for task, task_from_redis in zip(sorted_tasks[start:start + length], tasks_from_redis_dict):
+        for task, task_from_redis in zip(sorted_tasks_paginated, tasks_from_redis_dict):
             task_dict = as_dict(self.format_task(task)[1])
             if task_dict.get('worker'):
                 task_dict['worker'] = task_dict['worker'].hostname

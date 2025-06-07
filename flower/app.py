@@ -6,7 +6,6 @@ from concurrent.futures import ThreadPoolExecutor
 import celery
 import tornado.web
 
-import redis
 from tornado import ioloop
 from tornado.httpserver import HTTPServer
 from tornado.web import url
@@ -51,7 +50,9 @@ class Flower(tornado.web.Application):
 
         self.capp = capp or celery.Celery()
         self.capp.loader.import_default_modules()
-
+        self.capp.conf.update(
+            timezone='Asia/Bangkok'
+        )
         self.executor = self.pool_executor_cls(max_workers=self.max_workers)
         self.io_loop.set_default_executor(self.executor)
 

@@ -92,7 +92,15 @@ class TasksDataTable(BaseHandler):
             if task_dict.get('worker'):
                 task_dict['worker'] = task_dict['worker'].hostname
 
-            if task_dict['state'] == 'SUCCESS':
+            if task_dict['state'] == 'STARTED':
+                if task_from_redis['PROCESSING']:
+                    task_dict['service'] = task_from_redis['result']['service']
+                    task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
+                else:
+                    task_dict['service'] = None
+                    task_dict['upstream'] = None
+
+            elif task_dict['state'] == 'SUCCESS':
                 task_dict['service'] = task_from_redis['result']['service']
                 task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
             elif task_dict['state'] == 'FAILURE':

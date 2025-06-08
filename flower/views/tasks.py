@@ -165,7 +165,7 @@ class TasksDataTable(BaseHandler):
 
             filtered_tasks[idx] = task_dict
 
-
+        logger.debug(f"filtered_tasks: {filtered_tasks}")
         self.write(dict(draw=draw, data=filtered_tasks,
                         recordsTotal=len(sorted_tasks),
                         recordsFiltered=len(sorted_tasks)))

@@ -8,10 +8,10 @@ import json
 from tornado import web
 
 from ..utils.tasks import as_dict, get_task_by_id, iter_tasks
+from ..utils.task_state import TaskStatus
 from ..views import BaseHandler
 
 logger = logging.getLogger(__name__)
-
 
 class TaskView(BaseHandler):
     @web.authenticated
@@ -84,30 +84,40 @@ class TasksDataTable(BaseHandler):
         sorted_tasks_paginated = sorted_tasks[start:start + length]
         filtered_tasks = []
         task_ids = [task[0] for task in sorted_tasks_paginated]
-        tasks_from_redis = self.application.redis_client.get_tasks_by_id(task_ids)
-        tasks_from_redis_dict = [json.loads(task) for task in tasks_from_redis]
 
-        for task, task_from_redis in zip(sorted_tasks_paginated, tasks_from_redis_dict):
+        for task in sorted_tasks_paginated:
             task_dict = as_dict(self.format_task(task)[1])
             if task_dict.get('worker'):
                 task_dict['worker'] = task_dict['worker'].hostname
-
-            if task_dict['state'] == 'STARTED':
-                if task_from_redis['status'] == 'PROCESSING':
-                    task_dict['service'] = task_from_redis['result']['service']
-                    task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
-                else:
-                    task_dict['service'] = None
-                    task_dict['upstream'] = None
-
-            elif task_dict['state'] == 'SUCCESS':
-                task_dict['service'] = task_from_redis['result']['service']
-                task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
-            elif task_dict['state'] == 'FAILURE':
-                task_dict['service'] = task_from_redis['result']['exc_message'][0]['exc_data']['service']
-                task_dict['upstream'] = task_from_redis['result']['exc_message'][0]['exc_data']['target'] if task_from_redis['result']['exc_message'][0]['exc_data']['target'] else task_from_redis['result']['exc_message'][0]['exc_data']['upstream_url']
-
+            task_dict['service'] = 'test-service'
+            task_dict['upstream'] = 'test-upstream'
             filtered_tasks.append(task_dict)
+
+        # # TODO: handle case when task still in celery queue or expired or removed from redis (PENDING STATE)
+        # tasks_from_redis = self.application.redis_client.get_tasks_by_id(task_ids)
+        # tasks_from_redis_dict = [json.loads(task) for task in tasks_from_redis]
+
+        # for task, task_from_redis in zip(sorted_tasks_paginated, tasks_from_redis_dict):
+        #     task_dict = as_dict(self.format_task(task)[1])
+        #     if task_dict.get('worker'):
+        #         task_dict['worker'] = task_dict['worker'].hostname
+
+        #     if task_dict['state'] == TaskStatus.STARTED:
+        #         if task_from_redis['status'] == TaskStatus.PROCESSING:
+        #             task_dict['service'] = task_from_redis['result']['service']
+        #             task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
+        #         else:
+        #             task_dict['service'] = None
+        #             task_dict['upstream'] = None
+
+        #     elif task_dict['state'] == TaskStatus.SUCCESS:
+        #         task_dict['service'] = task_from_redis['result']['service']
+        #         task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
+        #     elif task_dict['state'] == TaskStatus.FAILURE:
+        #         task_dict['service'] = task_from_redis['result']['exc_message'][0]['exc_data']['service']
+        #         task_dict['upstream'] = task_from_redis['result']['exc_message'][0]['exc_data']['target'] if task_from_redis['result']['exc_message'][0]['exc_data']['target'] else task_from_redis['result']['exc_message'][0]['exc_data']['upstream_url']
+
+        #     filtered_tasks.append(task_dict)
 
 
         self.write(dict(draw=draw, data=filtered_tasks,

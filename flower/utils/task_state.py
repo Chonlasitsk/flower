@@ -1,0 +1,12 @@
+from enum import Enum
+
+class TaskStatus(str, Enum):
+    STARTED = 'STARTED'
+    PROCESSING = 'PROCESSING'
+    SUCCESS = 'SUCCESS'
+    FAILURE = 'FAILURE'
+    PENDING = 'PENDING'
+    RETRY = 'RETRY'
+    REVOKED = 'REVOKED'
+    REJECTED = 'REJECTED'
+    CANCELLED = 'CANCELLED'

@@ -128,10 +128,10 @@ class TasksDataTable(BaseHandler):
         for idx, (task, task_from_redis, task_ttl) in enumerate(zip(sorted_tasks_paginated, tasks_from_redis_dict, task_ttls)):
             task_id = task[0]
             task_dict = as_dict(self.format_task(task)[1])
+            if task_dict.get('worker'):
+                task_dict['worker'] = task_dict['worker'].hostname
+                
             if task_id not in self.application.task_data_cache:
-                if task_dict.get('worker'):
-                    task_dict['worker'] = task_dict['worker'].hostname
-
                 if task_dict['state'] == TaskStatus.STARTED:
                     if task_from_redis['status'] == TaskStatus.PROCESSING:
                         task_dict['service'] = task_from_redis['result']['service']

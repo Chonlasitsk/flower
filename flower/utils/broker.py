@@ -128,6 +128,7 @@ class Redis(RedisBase):
         self.port = self.port or 6379
         self.vhost = self._prepare_virtual_host(self.vhost)
         self.redis = self._get_redis_client()
+        self.redis_pipeline = self.redis.pipeline()
 
     def _prepare_virtual_host(self, vhost):
         if not isinstance(vhost, numbers.Integral):
@@ -163,6 +164,13 @@ class Redis(RedisBase):
         prefix = "celery-task-meta"
         keys = [f"{prefix}-{task_id}" for task_id in task_ids]
         return self.redis.mget(keys)
+    
+    def get_ttls_by_id(self, task_ids):
+        prefix = "celery-task-meta"
+        keys = [f"{prefix}-{task_id}" for task_id in task_ids]
+        for key in keys:
+            self.redis_pipeline.ttl(key)
+        return self.redis_pipeline.execute()
 
 
 class RedisSentinel(RedisBase):

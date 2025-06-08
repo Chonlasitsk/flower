@@ -82,42 +82,49 @@ class TasksDataTable(BaseHandler):
             logger.debug(f"Number of filtered tasks by state: {len(sorted_tasks)}")
 
         sorted_tasks_paginated = sorted_tasks[start:start + length]
-        filtered_tasks = []
-        task_ids = [task[0] for task in sorted_tasks_paginated]
 
-        for task in sorted_tasks_paginated:
-            task_dict = as_dict(self.format_task(task)[1])
-            if task_dict.get('worker'):
-                task_dict['worker'] = task_dict['worker'].hostname
-            task_dict['service'] = 'test-service'
-            task_dict['upstream'] = 'test-upstream'
-            filtered_tasks.append(task_dict)
-
-        # # TODO: handle case when task still in celery queue or expired or removed from redis (PENDING STATE)
-        # tasks_from_redis = self.application.redis_client.get_tasks_by_id(task_ids)
-        # tasks_from_redis_dict = [json.loads(task) for task in tasks_from_redis]
-
-        # for task, task_from_redis in zip(sorted_tasks_paginated, tasks_from_redis_dict):
+        # for task in sorted_tasks_paginated:
         #     task_dict = as_dict(self.format_task(task)[1])
         #     if task_dict.get('worker'):
         #         task_dict['worker'] = task_dict['worker'].hostname
-
-        #     if task_dict['state'] == TaskStatus.STARTED:
-        #         if task_from_redis['status'] == TaskStatus.PROCESSING:
-        #             task_dict['service'] = task_from_redis['result']['service']
-        #             task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
-        #         else:
-        #             task_dict['service'] = None
-        #             task_dict['upstream'] = None
-
-        #     elif task_dict['state'] == TaskStatus.SUCCESS:
-        #         task_dict['service'] = task_from_redis['result']['service']
-        #         task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
-        #     elif task_dict['state'] == TaskStatus.FAILURE:
-        #         task_dict['service'] = task_from_redis['result']['exc_message'][0]['exc_data']['service']
-        #         task_dict['upstream'] = task_from_redis['result']['exc_message'][0]['exc_data']['target'] if task_from_redis['result']['exc_message'][0]['exc_data']['target'] else task_from_redis['result']['exc_message'][0]['exc_data']['upstream_url']
-
+        #     task_dict['service'] = 'test-service'
+        #     task_dict['upstream'] = 'test-upstream'
         #     filtered_tasks.append(task_dict)
+
+        # TODO: handle case when task still in celery queue or expired or removed from redis (PENDING STATE)
+        task_ids = [task[0] for task in sorted_tasks_paginated]
+        tasks_from_redis = self.application.redis_client.get_tasks_by_id(task_ids)
+        tasks_from_redis_dict = [None] * len(sorted_tasks_paginated)
+        for idx, task in enumerate(tasks_from_redis):
+            if task:
+                tasks_from_redis_dict[idx] = json.loads(task)
+            else:
+                tasks_from_redis_dict[idx] = None
+
+        filtered_tasks = [None] * len(sorted_tasks_paginated)
+        for idx, (task, task_from_redis) in enumerate(zip(sorted_tasks_paginated, tasks_from_redis_dict)):
+            task_dict = as_dict(self.format_task(task)[1])
+            if task_dict.get('worker'):
+                task_dict['worker'] = task_dict['worker'].hostname
+
+            if task_dict['state'] == TaskStatus.STARTED:
+                if task_from_redis['status'] == TaskStatus.PROCESSING:
+                    task_dict['service'] = task_from_redis['result']['service']
+                    task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
+                else:
+                    task_dict['service'] = None
+                    task_dict['upstream'] = None
+            elif task_dict['state'] == TaskStatus.SUCCESS:
+                task_dict['service'] = task_from_redis['result']['service']
+                task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
+            elif task_dict['state'] == TaskStatus.FAILURE:
+                task_dict['service'] = task_from_redis['result']['exc_message'][0]['exc_data']['service']
+                task_dict['upstream'] = task_from_redis['result']['exc_message'][0]['exc_data']['target'] if task_from_redis['result']['exc_message'][0]['exc_data']['target'] else task_from_redis['result']['exc_message'][0]['exc_data']['upstream_url']
+            elif task_dict['state'] == TaskStatus.PENDING:
+                task_dict['service'] = None
+                task_dict['upstream'] = None
+
+            filtered_tasks[idx] = task_dict
 
 
         self.write(dict(draw=draw, data=filtered_tasks,

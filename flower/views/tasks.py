@@ -113,7 +113,21 @@ class TasksDataTable(BaseHandler):
                 task_dict['worker'] = task_dict['worker'].hostname
 
             if task_dict['state'] == TaskStatus.STARTED:
-                if task_from_redis['status'] == TaskStatus.PROCESSING:
+                if task_from_redis:
+                    if task_from_redis['status'] == TaskStatus.PROCESSING:
+                        task_dict['service'] = task_from_redis['result']['service']
+                        task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
+                        task_dict['expired'] = "No" if task_ttl > 0 else "Yes"
+                    else:
+                        task_dict['service'] = None
+                        task_dict['upstream'] = None
+                        task_dict['expired'] = "No" if task_ttl > 0 else "Yes"
+                else:
+                    task_dict['service'] = None
+                    task_dict['upstream'] = None
+                    task_dict['expired'] = "No" if task_ttl > 0 else "Yes"
+            elif task_dict['state'] == TaskStatus.SUCCESS:
+                if task_from_redis:
                     task_dict['service'] = task_from_redis['result']['service']
                     task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
                     task_dict['expired'] = "No" if task_ttl > 0 else "Yes"
@@ -121,14 +135,15 @@ class TasksDataTable(BaseHandler):
                     task_dict['service'] = None
                     task_dict['upstream'] = None
                     task_dict['expired'] = "No" if task_ttl > 0 else "Yes"
-            elif task_dict['state'] == TaskStatus.SUCCESS:
-                task_dict['service'] = task_from_redis['result']['service']
-                task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
-                task_dict['expired'] = "No" if task_ttl > 0 else "Yes"
             elif task_dict['state'] == TaskStatus.FAILURE:
-                task_dict['service'] = task_from_redis['result']['exc_message'][0]['exc_data']['service']
-                task_dict['upstream'] = task_from_redis['result']['exc_message'][0]['exc_data']['target'] if task_from_redis['result']['exc_message'][0]['exc_data']['target'] else task_from_redis['result']['exc_message'][0]['exc_data']['upstream_url']
-                task_dict['expired'] = "No" if task_ttl > 0 else "Yes"
+                if task_from_redis:
+                    task_dict['service'] = task_from_redis['result']['exc_message'][0]['exc_data']['service']
+                    task_dict['upstream'] = task_from_redis['result']['exc_message'][0]['exc_data']['target'] if task_from_redis['result']['exc_message'][0]['exc_data']['target'] else task_from_redis['result']['exc_message'][0]['exc_data']['upstream_url']
+                    task_dict['expired'] = "No" if task_ttl > 0 else "Yes"
+                else:
+                    task_dict['service'] = None
+                    task_dict['upstream'] = None
+                    task_dict['expired'] = "No" if task_ttl > 0 else "Yes"
             elif task_dict['state'] == TaskStatus.PENDING:
                 task_dict['service'] = None
                 task_dict['upstream'] = None

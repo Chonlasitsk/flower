@@ -69,6 +69,8 @@ class Flower(tornado.web.Application):
             max_tasks_in_memory=self.options.max_tasks)
         self.started = False
         self.redis_client = Redis(self.capp.connection().as_uri())
+        self.task_data_cache = {}
+
 
     def start(self):
         self.events.start()

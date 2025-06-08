@@ -92,28 +92,46 @@ class TasksDataTable(BaseHandler):
 
         # ✅ TODO: handle case when task still in celery queue or expired or removed from redis (PENDING STATE)
         # TODO: handle case when task is expired
+        data_tasks_id = ['None'] * len(sorted_tasks_paginated)
+        for idx, task in enumerate(sorted_tasks_paginated):
+            if task[0] not in self.application.task_data_cache:
+                data_tasks_id[idx] = task[0]
+
         task_ids = [task[0] for task in sorted_tasks_paginated]
         task_ttls = self.application.redis_client.get_ttls_by_id(task_ids)
-        tasks_from_redis = self.application.redis_client.get_tasks_by_id(task_ids)
-        tasks_from_redis_dict = [None] * len(sorted_tasks_paginated)
 
-        for idx, task in enumerate(tasks_from_redis):
-            if task:
-                tasks_from_redis_dict[idx] = json.loads(task)
-            else:
-                tasks_from_redis_dict[idx] = None
+        tasks_from_redis_dict = [None] * len(sorted_tasks_paginated)
+        if not all(task == 'None' for task in data_tasks_id):
+            tasks_from_redis = self.application.redis_client.get_tasks_by_id(data_tasks_id)
+            for idx, task in enumerate(tasks_from_redis):
+                if task:
+                    tasks_from_redis_dict[idx] = json.loads(task)
+                else:
+                    tasks_from_redis_dict[idx] = None
+
 
         logger.debug(f"Number of task_ttls: {len(task_ttls)}")
         logger.debug(f"Number of tasks_from_redis_dict: {len(tasks_from_redis_dict)}")
         logger.debug(f"Number of sorted_tasks_paginated: {len(sorted_tasks_paginated)}")
+        logger.debug(f"task_data_cache: {self.application.tas_data_cache.keys()}")
+        logger.debug(f"Number of task_data_cache: {len(self.application.tas_data_cache.keys())}")
+        """
+            task_data_cache = {
+                "task_id": {
+                    "service": "[service-name]",
+                    "upstream": "[upstream-url]"
+                }
+            }
+        """
         filtered_tasks = [None] * len(sorted_tasks_paginated)
         for idx, (task, task_from_redis, task_ttl) in enumerate(zip(sorted_tasks_paginated, tasks_from_redis_dict, task_ttls)):
-            task_dict = as_dict(self.format_task(task)[1])
-            if task_dict.get('worker'):
-                task_dict['worker'] = task_dict['worker'].hostname
+            task_id = task[0]
+            if task_id not in self.application.task_data_cache:
+                task_dict = as_dict(self.format_task(task)[1])
+                if task_dict.get('worker'):
+                    task_dict['worker'] = task_dict['worker'].hostname
 
-            if task_dict['state'] == TaskStatus.STARTED:
-                if task_from_redis:
+                if task_dict['state'] == TaskStatus.STARTED:
                     if task_from_redis['status'] == TaskStatus.PROCESSING:
                         task_dict['service'] = task_from_redis['result']['service']
                         task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
@@ -122,32 +140,28 @@ class TasksDataTable(BaseHandler):
                         task_dict['service'] = None
                         task_dict['upstream'] = None
                         task_dict['expired'] = "No" if task_ttl > 0 else "Yes"
-                else:
-                    task_dict['service'] = None
-                    task_dict['upstream'] = None
-                    task_dict['expired'] = "No" if task_ttl > 0 else "Yes"
-            elif task_dict['state'] == TaskStatus.SUCCESS:
-                if task_from_redis:
+                elif task_dict['state'] == TaskStatus.SUCCESS:
                     task_dict['service'] = task_from_redis['result']['service']
                     task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
                     task_dict['expired'] = "No" if task_ttl > 0 else "Yes"
-                else:
-                    task_dict['service'] = None
-                    task_dict['upstream'] = None
-                    task_dict['expired'] = "No" if task_ttl > 0 else "Yes"
-            elif task_dict['state'] == TaskStatus.FAILURE:
-                if task_from_redis:
+                elif task_dict['state'] == TaskStatus.FAILURE:
                     task_dict['service'] = task_from_redis['result']['exc_message'][0]['exc_data']['service']
                     task_dict['upstream'] = task_from_redis['result']['exc_message'][0]['exc_data']['target'] if task_from_redis['result']['exc_message'][0]['exc_data']['target'] else task_from_redis['result']['exc_message'][0]['exc_data']['upstream_url']
                     task_dict['expired'] = "No" if task_ttl > 0 else "Yes"
-                else:
+                elif task_dict['state'] == TaskStatus.PENDING:
                     task_dict['service'] = None
                     task_dict['upstream'] = None
-                    task_dict['expired'] = "No" if task_ttl > 0 else "Yes"
-            elif task_dict['state'] == TaskStatus.PENDING:
-                task_dict['service'] = None
-                task_dict['upstream'] = None
-                task_dict['expired'] = "No"
+                    task_dict['expired'] = "No"
+
+                if task_dict['service'] and task_dict['upstream']:
+                    self.application.task_data_cache[task_id] = {
+                        'service': task_dict['service'],
+                        'upstream': task_dict['upstream']
+                    }
+            else:
+                task_dict['service'] = self.application.task_data_cache[task_id]['service']
+                task_dict['upstream'] = self.application.task_data_cache[task_id]['upstream']
+                task_dict['expired'] = "No" if task_ttl > 0 else "Yes"
 
             filtered_tasks[idx] = task_dict
 

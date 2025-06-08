@@ -113,8 +113,8 @@ class TasksDataTable(BaseHandler):
         logger.debug(f"Number of task_ttls: {len(task_ttls)}")
         logger.debug(f"Number of tasks_from_redis_dict: {len(tasks_from_redis_dict)}")
         logger.debug(f"Number of sorted_tasks_paginated: {len(sorted_tasks_paginated)}")
-        logger.debug(f"task_data_cache: {self.application.tas_data_cache.keys()}")
-        logger.debug(f"Number of task_data_cache: {len(self.application.tas_data_cache.keys())}")
+        logger.debug(f"task_data_cache: {self.application.task_data_cache.keys()}")
+        logger.debug(f"Number of task_data_cache: {len(self.application.task_data_cache.keys())}")
         """
             task_data_cache = {
                 "task_id": {

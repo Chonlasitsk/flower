@@ -109,6 +109,7 @@ class TasksDataTable(BaseHandler):
 
             if task_dict['state'] == TaskStatus.STARTED:
                 if task_from_redis['status'] == TaskStatus.PROCESSING:
+                    logger.debug(f"task_from_redis: {task_from_redis}")
                     task_dict['service'] = task_from_redis['result']['service']
                     task_dict['upstream'] = task_from_redis['result']['target'] if task_from_redis['result']['target'] else task_from_redis['result']['upstream_url']
                 else:

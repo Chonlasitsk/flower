@@ -102,6 +102,7 @@ class TasksDataTable(BaseHandler):
 
         tasks_from_redis_dict = [None] * len(sorted_tasks_paginated)
         if not all(task == 'None' for task in data_tasks_id):
+            logger.debug(f"data_tasks_id: {data_tasks_id}")
             tasks_from_redis = self.application.redis_client.get_tasks_by_id(data_tasks_id)
             for idx, task in enumerate(tasks_from_redis):
                 if task:

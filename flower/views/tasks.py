@@ -2,7 +2,6 @@ import copy
 import logging
 from functools import total_ordering
 import re
-import ast
 import json
 
 from tornado import web

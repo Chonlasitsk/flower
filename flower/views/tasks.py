@@ -90,8 +90,7 @@ class TasksDataTable(BaseHandler):
         #     task_dict['upstream'] = 'test-upstream'
         #     filtered_tasks.append(task_dict)
 
-        # ✅ TODO: handle case when task still in celery queue or expired or removed from redis (PENDING STATE)
-        # TODO: handle case when task is expired
+
         data_tasks_id = ['None'] * len(sorted_tasks_paginated)
         for idx, task in enumerate(sorted_tasks_paginated):
             if task[0] not in self.application.task_data_cache:
@@ -130,7 +129,7 @@ class TasksDataTable(BaseHandler):
             task_dict = as_dict(self.format_task(task)[1])
             if task_dict.get('worker'):
                 task_dict['worker'] = task_dict['worker'].hostname
-                
+
             if task_id not in self.application.task_data_cache:
                 if task_dict['state'] == TaskStatus.STARTED:
                     if task_from_redis['status'] == TaskStatus.PROCESSING:

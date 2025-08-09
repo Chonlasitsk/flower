@@ -23,10 +23,11 @@ def iter_tasks(events, limit=None, offset=0, type=None, worker=None, state=None,
 
     for uuid, task in tasks:
         logger.debug(f"all attr of task in iter_tasks: {task.__dict__}")
-        task = task.as_dict()
-        logger.debug(f"task in iter_tasks: {task}")
+        task_dict = task.as_dict()
+
+        logger.debug(f"task in iter_tasks: {task_dict}: {type(task_dict)}")
         with open("task_{}.json".format(uuid), "w") as f:
-            f.write(json.dumps(task, ensure_ascii=False, indent=4))
+            f.write(json.dumps(task_dict, ensure_ascii=False, indent=4))
         if type and task.name != type:
             continue
         if worker and task.worker and task.worker.hostname != worker:

@@ -6,6 +6,14 @@ import json
 from .search import parse_search_terms, satisfies_search_terms
 logger = logging.getLogger(__name__)
 
+def custom_serializer(o):
+    if isinstance(o, datetime):
+        return o.isoformat()           # แปลง datetime → string
+    if isinstance(o, bytes):
+        return o.decode('utf-8')       # แปลง bytes → string
+    if hasattr(o, "__dict__"):
+        return o.__dict__              # แปลง object → dict
+    return str(o)                      # fallback
 
 # pylint: disable=too-many-branches,too-many-locals,too-many-arguments
 def iter_tasks(events, limit=None, offset=0, type=None, worker=None, state=None,
@@ -26,8 +34,8 @@ def iter_tasks(events, limit=None, offset=0, type=None, worker=None, state=None,
         task_dict = task.__dict__
 
         logger.debug(f"task in iter_tasks: {task_dict}")
-        with open("task_{}.json".format(uuid), "w") as f:
-            f.write(json.dumps(task_dict, ensure_ascii=False, indent=4))
+        with open("task_{}.json".format(uuid), "w", encoding="utf-8") as f:
+            f.write(json.dumps(task_dict, ensure_ascii=False, indent=4, default=custom_serializer))
         if type and task.name != type:
             continue
         if worker and task.worker and task.worker.hostname != worker:

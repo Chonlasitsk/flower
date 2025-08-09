@@ -22,7 +22,7 @@ def iter_tasks(events, limit=None, offset=0, type=None, worker=None, state=None,
     search_terms = parse_search_terms(search or {})
 
     for uuid, task in tasks:
-        logger.debug(f"all attr of task in iter_tasks: {task.__dict__} type: {type(task.__dict__)}")
+        logger.debug(f"all attr of task in iter_tasks: {task.__dict__}")
         with open("task_{}.json".format(uuid), "w") as f:
             task_dict = task.__dict__
             f.write(json.dumps(task_dict, ensure_ascii=False, indent=4))

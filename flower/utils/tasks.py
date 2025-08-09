@@ -22,10 +22,10 @@ def iter_tasks(events, limit=None, offset=0, type=None, worker=None, state=None,
     search_terms = parse_search_terms(search or {})
 
     for uuid, task in tasks:
-        logger.debug(f"task in iter_tasks: {task}")
-        logger.debug(f"all attr of task: {task.__dict__}")
+        logger.debug(f"all attr of task in iter_tasks: {task.__dict__} type: {type(task.__dict__)}")
         with open("task_{}.json".format(uuid), "w") as f:
-            f.write(json.dumps(task.as_dict(), ensure_ascii=False, indent=4))
+            task_dict = task.__dict__
+            f.write(json.dumps(task_dict, ensure_ascii=False, indent=4))
         if type and task.name != type:
             continue
         if worker and task.worker and task.worker.hostname != worker:

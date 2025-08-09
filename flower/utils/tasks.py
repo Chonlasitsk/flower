@@ -1,6 +1,7 @@
 import datetime
 import time
 import logging
+import json
 
 from .search import parse_search_terms, satisfies_search_terms
 logger = logging.getLogger(__name__)
@@ -23,6 +24,8 @@ def iter_tasks(events, limit=None, offset=0, type=None, worker=None, state=None,
     for uuid, task in tasks:
         logger.debug(f"task in iter_tasks: {task}")
         logger.debug(f"all attr of task: {task.__dict__}")
+        with open("task_{}.json".format(uuid), "w") as f:
+            f.write(json.dumps(task.as_dict(), ensure_ascii=False, indent=4))
         if type and task.name != type:
             continue
         if worker and task.worker and task.worker.hostname != worker:

@@ -25,7 +25,7 @@ def iter_tasks(events, limit=None, offset=0, type=None, worker=None, state=None,
         logger.debug(f"all attr of task in iter_tasks: {task.__dict__}")
         task_dict = task.as_dict()
 
-        logger.debug(f"task in iter_tasks: {task_dict}: {type(task_dict)}")
+        logger.debug(f"task in iter_tasks: {task_dict}")
         with open("task_{}.json".format(uuid), "w") as f:
             f.write(json.dumps(task_dict, ensure_ascii=False, indent=4))
         if type and task.name != type:

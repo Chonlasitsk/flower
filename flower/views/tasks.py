@@ -54,6 +54,7 @@ class TasksDataTable(BaseHandler):
         start = self.get_argument('start', type=int)
         length = self.get_argument('length', type=int)
         search = self.get_argument('search[value]', type=str)
+        logger.debug(f"search: {search}")
 
         column = self.get_argument('order[0][column]', type=int)
         sort_by = self.get_argument(f'columns[{column}][data]', type=str)

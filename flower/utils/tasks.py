@@ -19,6 +19,7 @@ def iter_tasks(events, limit=None, offset=0, type=None, worker=None, state=None,
         return time.mktime(datetime.datetime.strptime(x, '%Y-%m-%d %H:%M').timetuple())
 
     search_terms = parse_search_terms(search or {})
+    logger.debug(f"tasks in iter_tasks: {tasks}")
 
     for uuid, task in tasks:
         if type and task.name != type:

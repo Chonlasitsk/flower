@@ -112,7 +112,12 @@ class TasksDataTable(BaseHandler):
 
         # filter tasks by search
         if search:
-            kw_search, search_value = search.lower().replace(" ", "").split(":")
+            search_data = search.lower().replace(" ", "").split(":")
+            if len(search_data) == 2:
+                kw_search, search_value = search_data
+            else:
+                kw_search = ""
+                search_value = ""
             logger.debug(f"search: {search}")
             logger.debug(f"filtered_tasks: {filtered_tasks}")
             logger.debug(f"kw_search: {kw_search}")

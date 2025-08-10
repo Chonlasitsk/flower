@@ -122,9 +122,9 @@ class TasksDataTable(BaseHandler):
             logger.debug(f"filtered_tasks: {filtered_tasks}")
             logger.debug(f"kw_search: {kw_search}")
             logger.debug(f"search_value: {search_value}")
-            filtered_tasks = list(filter(lambda x: x[kw_search] == search_value, filtered_tasks))
-            logger.debug(f"filtered_tasks after search: {filtered_tasks}")
-
+            if kw_search and search_value:
+                filtered_tasks = list(filter(lambda x: x[kw_search] == search_value, filtered_tasks))
+                logger.debug(f"filtered_tasks after search: {filtered_tasks}")
 
 
         # data_tasks_id = ['None'] * len(sorted_tasks_paginated)

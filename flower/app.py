@@ -57,7 +57,13 @@ class Flower(tornado.web.Application):
         self.io_loop.set_default_executor(self.executor)
 
         self.inspector = Inspector(self.io_loop, self.capp, self.options.inspect_timeout / 1000.0)
-
+        logger.debug(f"self.options: {self.options}")
+        logger.debug(f"self.options.db: {self.options.db}")
+        logger.debug(f"self.options.persistent: {self.options.persistent}")
+        logger.debug(f"self.options.state_save_interval: {self.options.state_save_interval}")
+        logger.debug(f"self.options.enable_events: {self.options.enable_events}")
+        logger.debug(f"self.options.max_workers: {self.options.max_workers}")
+        logger.debug(f"self.options.max_tasks: {self.options.max_tasks}")
         self.events = events or Events(
             self.capp,
             db=self.options.db,

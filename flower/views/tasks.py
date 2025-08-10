@@ -164,7 +164,13 @@ class TasksDataTable(BaseHandler):
                 task_dict['upstream'] = self.application.task_data_cache[task_id]['upstream']
                 task_dict['expired'] = "No" if task_ttl > 0 else "Yes"
 
-            filtered_tasks[idx] = task_dict
+            if search:
+                if task_dict['upstream'] == search:
+                    filtered_tasks[idx] = task_dict
+                else:
+                    filtered_tasks[idx] = None
+            else:
+                filtered_tasks[idx] = task_dict
 
         self.write(dict(draw=draw, data=filtered_tasks,
                         recordsTotal=len(sorted_tasks),

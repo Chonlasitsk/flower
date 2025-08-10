@@ -168,12 +168,14 @@ class TasksDataTable(BaseHandler):
                 if search.lower() == task_dict['upstream'].lower():
                     logger.debug(f"Found task: {task_dict['upstream']}")
                     filtered_tasks[idx] = task_dict
-                # else:
-                #     filtered_tasks[idx] = None
+                else:
+                    filtered_tasks[idx] = None
             else:
                 filtered_tasks[idx] = task_dict
+        
+        filtered_search_task = [task for task in filtered_tasks if task is not None]
 
-        self.write(dict(draw=draw, data=filtered_tasks,
+        self.write(dict(draw=draw, data=filtered_search_task,
                         recordsTotal=len(sorted_tasks),
                         recordsFiltered=len(sorted_tasks)))
 

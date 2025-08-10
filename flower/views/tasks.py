@@ -107,6 +107,7 @@ class TasksDataTable(BaseHandler):
                 task_dict['worker'] = task_dict['worker'].hostname
             task_dict['service'] = tasks_from_redis_dict[idx].get('service', None) if tasks_from_redis_dict[idx] else None
             task_dict['upstream'] = tasks_from_redis_dict[idx].get('upstream_url', None) if tasks_from_redis_dict[idx] else None
+            task_dict['email'] = tasks_from_redis_dict[idx].get('email', None) if tasks_from_redis_dict[idx] else None
             task_dict['expired'] = "No" if task_ttls[idx] > 0 else "Yes"
             filtered_tasks.append(task_dict)
 

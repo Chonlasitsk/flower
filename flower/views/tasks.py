@@ -166,7 +166,7 @@ class TasksDataTable(BaseHandler):
 
             if search:
                 pattern = re.compile(search)
-                if re.match(pattern, task_dict['upstream']):
+                if pattern.match(task_dict['upstream']):
                     filtered_tasks[idx] = task_dict
                 else:
                     filtered_tasks[idx] = None

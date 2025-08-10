@@ -90,7 +90,7 @@ class TasksDataTable(BaseHandler):
         #     task_dict['service'] = 'test-service'
         #     task_dict['upstream'] = 'test-upstream'
         #     filtered_tasks.append(task_dict)
-        
+
         task_ids = [task[0] for task in sorted_tasks_paginated]
         tasks_from_redis = self.application.redis_client.get_tasks_by_id(task_ids)
         tasks_from_redis_dict = []
@@ -205,7 +205,7 @@ class TasksDataTable(BaseHandler):
         
         # filtered_search_task = [task for task in filtered_tasks if task is not None]
 
-        self.write(dict(draw=draw, data=filtered_search_task,
+        self.write(dict(draw=draw, data=filtered_tasks,
                         recordsTotal=len(sorted_tasks),
                         recordsFiltered=len(sorted_tasks)))
 

@@ -112,7 +112,7 @@ class TasksDataTable(BaseHandler):
 
         # filter tasks by search
         if search:
-            search_data = search.lower().replace(" ", "").split(":")
+            search_data = search.lower().replace(" ", "").split(":", maxsplit=1)
             if len(search_data) == 2:
                 kw_search, search_value = search_data
             else:

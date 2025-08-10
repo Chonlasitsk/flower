@@ -129,6 +129,7 @@ class Redis(RedisBase):
         self.vhost = self._prepare_virtual_host(self.vhost)
         self.redis = self._get_redis_client()
         self.redis_pipeline = self.redis.pipeline()
+        self.redis_dashboard = self._get_redis_client_dashboard()
 
     def _prepare_virtual_host(self, vhost):
         if not isinstance(vhost, numbers.Integral):
@@ -155,15 +156,19 @@ class Redis(RedisBase):
         logger.debug(f"connecting to redis with config: {self._get_redis_client_args()}")
         return redis.Redis(**self._get_redis_client_args())
     
+    def _get_redis_client_dashboard(self):
+        logger.debug(f"connecting to redis dashboard with config: {self.host}, {self.port}, 1")
+        return redis.Redis(host=self.host, port=self.port, db=1)
+    
     def get_task_by_id(self, task_id):
-        prefix = "celery-task-meta"
-        key = f"{prefix}-{task_id}"
-        return self.redis.get(key)
+        prefix = "dashboard"
+        key = f"{prefix}:{task_id}"
+        return self.redis_dashboard.get(key)
     
     def get_tasks_by_id(self, task_ids):
-        prefix = "celery-task-meta"
-        keys = [f"{prefix}-{task_id}" for task_id in task_ids]
-        return self.redis.mget(keys)
+        prefix = "dashboard"
+        keys = [f"{prefix}:{task_id}" for task_id in task_ids]
+        return self.redis_dashboard.mget(keys)
     
     def get_ttls_by_id(self, task_ids):
         prefix = "celery-task-meta"

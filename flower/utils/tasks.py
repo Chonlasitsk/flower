@@ -18,7 +18,6 @@ def iter_tasks(events, limit=None, offset=0, type=None, worker=None, state=None,
         return time.mktime(datetime.datetime.strptime(x, '%Y-%m-%d %H:%M').timetuple())
 
     search_terms = parse_search_terms(search or {})
-    logger.debug(f"search_terms: {search_terms}")
 
     for uuid, task in tasks:
         if type and task.name != type:
@@ -39,8 +38,8 @@ def iter_tasks(events, limit=None, offset=0, type=None, worker=None, state=None,
         if started_end and task.started and\
                 task.started > convert(started_end):
             continue
-        if not satisfies_search_terms(task, search_terms):
-            continue
+        # if not satisfies_search_terms(task, search_terms):
+        #     continue
         if i >= offset:
             yield uuid, task
         i += 1

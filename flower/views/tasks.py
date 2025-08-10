@@ -165,7 +165,8 @@ class TasksDataTable(BaseHandler):
                 task_dict['expired'] = "No" if task_ttl > 0 else "Yes"
 
             if search:
-                if task_dict['upstream'] == search:
+                pattern = re.compile(search)
+                if re.match(pattern, task_dict['upstream']):
                     filtered_tasks[idx] = task_dict
                 else:
                     filtered_tasks[idx] = None

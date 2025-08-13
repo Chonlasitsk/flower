@@ -73,6 +73,117 @@
     .ff-input{ width:100%; height:36px; background:var(--ff-input); border:1px solid var(--ff-border); color:var(--ff-text); border-radius:8px; padding:0 12px; outline:none }
     .ff-input:focus{ box-shadow:var(--ff-ring); border-color:transparent }
   </style>
+    <script>
+      // Filter component logic (scoped to tasks page)
+      (() => {
+        // Fields mapped to tasks table columns
+        // name(0), uuid(1), state(2), service(3), upstream(4), expired(5)
+        const FIELDS = [
+          { key:"name",    label:"Name",    type:"text" },
+          { key:"uuid",    label:"UUID",    type:"text" },
+          { key:"state",   label:"State",   type:"enum", options:["PENDING","RECEIVED","STARTED","RETRY","FAILURE","SUCCESS","REVOKED"] },
+          { key:"service", label:"Service", type:"enum", options:["asr","yt2audio","stt-pro","gateway"] },
+          { key:"upstream",label:"Upstream",type:"text" },
+          { key:"expired", label:"Expired", type:"enum", options:["true","false"] },
+        ];
+    
+        const state = { filters:[], logicOps:[] };
+        const draft = { field:null, type:null, value:null };
+        const uid = () => Math.random().toString(36).slice(2,10);
+    
+        const box   = document.getElementById('ff-box');
+        if (!box) return; // not on tasks page
+        const ph    = document.getElementById('ff-ph');
+        const caret = document.getElementById('ff-caret');
+        const clear = document.getElementById('ff-clear');
+        const dd    = document.getElementById('ff-dd');
+        const cField= document.getElementById('ff-cField');
+        const cVal  = document.getElementById('ff-cVal');
+        const sField= document.getElementById('ff-sField');
+        const sVal  = document.getElementById('ff-sVal');
+        const fList = document.getElementById('ff-fList');
+        const vBox  = document.getElementById('ff-vBox');
+    
+        const setPH = () => ph.style.display = (state.filters.length ? 'none':'inline');
+        const showX = () => clear.style.display = (state.filters.length || draft.field || caret.value.length || !dd.classList.contains('ff-hidden')) ? 'inline-flex':'none';
+        const prettyValue = (fd, val) => {
+          if (!fd) return String(val ?? '');
+          return String(val ?? '');
+        };
+    
+        function buildParams(){ const payload={filters:state.filters,logicOps:state.logicOps}; const p=new URLSearchParams(); p.set('filters',JSON.stringify(payload)); return p.toString(); }
+        function emitChange(){
+          box.dispatchEvent(new CustomEvent('filters:change',{
+            detail:{ state: JSON.parse(JSON.stringify(state)), params: buildParams() }
+          }));
+        }
+    
+        function removeDraft(){ const n = box.querySelector('.ff-draft'); if(n) n.remove(); }
+        function renderDraft(){
+          removeDraft(); if (!draft.field) return; const fd = FIELDS.find(x=>x.key===draft.field);
+          const span = document.createElement('span'); span.className='ff-draft';
+          span.innerHTML = `<strong>${fd?.label ?? draft.field}</strong><span>:</span><span class="muted">${draft.value||'…'}</span>`;
+          box.insertBefore(span, caret);
+        }
+    
+        function opChip(i){ const el=document.createElement('span'); el.className='ff-op'; el.textContent=state.logicOps[i]||'AND'; el.title='Click to toggle AND/OR'; el.onclick=()=>{ state.logicOps[i]=(state.logicOps[i]||'AND')==='AND'?'OR':'AND'; renderChips(); emitChange(); }; return el; }
+        function filterChip(f, idx){ const fd=FIELDS.find(x=>x.key===f.field); const el=document.createElement('span'); el.className='ff-chip'; el.innerHTML=`<span class="ff-chip__label">${fd?.label ?? f.field}</span><span class="ff-chip__sep">:</span><span class="ff-chip__value">${prettyValue(fd,f.value)}</span><button class="x" aria-label="Remove">×</button>`; el.querySelector('.x').onclick=()=>{ state.filters.splice(idx,1); if (state.logicOps.length){ if(idx < state.logicOps.length) state.logicOps.splice(idx,1); else state.logicOps.splice(idx-1,1); } renderChips(); setPH(); showX(); emitChange(); }; return el; }
+        function renderChips(){ [...box.querySelectorAll('.ff-chip,.ff-op')].forEach(n=>n.remove()); state.filters.forEach((f,i)=>{ if(i>0) box.insertBefore(opChip(i-1), caret); box.insertBefore(filterChip(f,i), caret); }); renderDraft(); }
+    
+        function placeDD(){ const r = box.getBoundingClientRect(); dd.style.top = `${r.bottom + (window.scrollY||document.documentElement.scrollTop) + 8}px`; dd.style.left= `${r.left + (window.scrollX||document.documentElement.scrollLeft)}px`; }
+        function openDD(){ placeDD(); dd.classList.remove('ff-hidden'); start(); document.addEventListener('click', outside, {capture:true}); showX(); }
+        function closeDD(){ dd.classList.add('ff-hidden'); document.removeEventListener('click', outside, {capture:true}); showX(); }
+        function outside(e){ if (dd.contains(e.target) || box.contains(e.target)) return; closeDD(); }
+        window.addEventListener('resize',()=>{ if(!dd.classList.contains('ff-hidden')) placeDD(); });
+    
+        function setStage(stage){ cField.classList.toggle('ff-active', stage==='field'); cVal.classList.toggle('ff-active',   stage==='value'); sField.classList.toggle('ff-hidden', stage!=='field'); sVal.classList.toggle('ff-hidden',   stage!=='value'); if(stage==='field') renderFieldList(); if(stage==='value') renderValueInput(true); }
+        function start(){ setStage('field'); }
+    
+        function renderFieldList(){ fList.innerHTML=''; FIELDS.forEach(f=>{ const it=document.createElement('div'); it.className='ff-item'; it.textContent=f.label; if (draft.field===f.key) it.setAttribute('aria-selected','true'); it.onclick=()=> chooseField(f); fList.appendChild(it); }); }
+        function chooseField(f){ draft.field=f.key; draft.type=f.type; draft.value=null; renderDraft(); showX(); setStage('value'); }
+    
+        function renderValueInput(prefill=false){ vBox.innerHTML=''; const t=draft.type; if(t==='enum'){ enumPicker(vBox, commitInstant, prefill?draft.value:''); return; } textOne(vBox,'Enter text', commitSimple, prefill?(draft.value||''):'', live=>{ draft.value=live; renderDraft(); showX(); }); }
+        function commitSimple(val){ if(val!==null && val!==''){ draft.value=val; addFilter(); } }
+        function commitInstant(val){ draft.value=val; addFilter(); }
+        function addFilter(){ if(!draft.field) return; state.filters.push({ id:uid(), field:draft.field, type:draft.type, value:draft.value }); if(state.filters.length>1) state.logicOps.push('AND'); renderChips(); setPH(); showX(); emitChange(); caret.value=''; draft.field=draft.type=draft.value=null; removeDraft(); setStage('field'); }
+    
+        function textOne(parent, ph, onDone, value='', onLive=null){ const el=document.createElement('input'); el.className='ff-input'; el.placeholder=ph; el.value=value||''; el.addEventListener('input',()=> onLive && onLive(el.value.trim())); el.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); onDone(el.value.trim()); }}); el.addEventListener('blur',()=> onDone(el.value.trim())); parent.appendChild(el); el.focus(); el.selectionStart=el.selectionEnd=el.value.length; }
+        function enumPicker(parent, onPick, value=''){ const list=document.createElement('div'); list.className='ff-list'; const fd=FIELDS.find(x=>x.key===draft.field); (fd?.options||[]).forEach(opt=>{ const it=document.createElement('div'); it.className='ff-item'; it.textContent=opt; if(value && value===opt) it.setAttribute('aria-selected','true'); it.onclick=()=> onPick(opt); list.appendChild(it); }); parent.appendChild(list); }
+    
+        // Wiring for interactions
+        const focusBox = () => caret.focus();
+        document.getElementById('ff-root')?.addEventListener('click', ()=>{ focusBox(); if(dd.classList.contains('ff-hidden')) openDD(); });
+        caret.addEventListener('focus', ()=>{ if(dd.classList.contains('ff-hidden')) openDD(); });
+        caret.addEventListener('keydown', (e)=>{ if(e.key==='Backspace' && !caret.value){ if (draft.field){ draft.field=draft.type=draft.value=null; removeDraft(); setStage('field'); showX(); return; } if(state.filters.length){ state.filters.pop(); if(state.logicOps.length) state.logicOps.pop(); renderChips(); setPH(); showX(); emitChange(); } }});
+        document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !dd.classList.contains('ff-hidden')) closeDD(); });
+        cField.addEventListener('click', ()=> setStage('field'));
+        cVal.addEventListener('click',   ()=> { if(draft.field) setStage('value'); });
+        clear.addEventListener('click', (e)=>{ e.stopPropagation(); state.filters=[]; state.logicOps=[]; caret.value=''; draft.field=draft.type=draft.value=null; removeDraft(); renderChips(); setPH(); showX(); setStage('field'); emitChange(); });
+    
+        // init
+        renderChips(); setPH(); showX();
+    
+        // DataTable integration: map filters to column searches and reload
+        const fieldToColumn = { name:0, uuid:1, state:2, service:3, upstream:4, expired:5 };
+        box.addEventListener('filters:change', (e)=>{
+          const api = window.jQuery && jQuery.fn && jQuery.fn.dataTable ? jQuery('#tasks-table').DataTable() : null;
+          if (!api) return;
+          // reset all relevant columns
+          Object.values(fieldToColumn).forEach(idx=> api.column(idx).search(''));
+          // apply filters (AND semantics)
+          (e.detail.state.filters||[]).forEach(f=>{
+            const idx = fieldToColumn[f.field];
+            if (idx === undefined) return;
+            if (f.type === 'enum') {
+              api.column(idx).search('^' + (f.value||'') + '$', true, false);
+            } else {
+              api.column(idx).search(String(f.value||''), false, true);
+            }
+          });
+          api.draw(); // server-side will receive column searches
+        });
+      })();
+  </script>
 
   <table id="tasks-table" class="table table-bordered table-striped table-hover w-100">
     <thead>

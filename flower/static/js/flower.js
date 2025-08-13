@@ -429,6 +429,7 @@ var flower = (function () {
         $('#workers-table').DataTable({
             rowId: 'name',
             searching: true,
+            dom: 'lrtip',
             select: false,
             paging: true,
             scrollCollapse: true,
@@ -539,7 +540,7 @@ var flower = (function () {
         $('#tasks-table').DataTable({
             rowId: 'uuid',
             searching: true,
-            dom: 'lrtip',
+            dom: 'lrftip',
             scrollX: true,
             scrollCollapse: true,
             processing: true,

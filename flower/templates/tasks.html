@@ -150,7 +150,12 @@
     
         // Wiring for interactions
         const focusBox = () => caret.focus();
-        document.getElementById('ff-root')?.addEventListener('click', ()=>{ focusBox(); if(dd.classList.contains('ff-hidden')) openDD(); });
+        // Only trigger when clicking the box itself, not the dropdown content
+        box.addEventListener('click', (e)=>{
+          if (dd.contains(e.target)) return; // don't steal focus from value input
+          focusBox();
+          if(dd.classList.contains('ff-hidden')) openDD();
+        });
         caret.addEventListener('focus', ()=>{ if(dd.classList.contains('ff-hidden')) openDD(); });
         caret.addEventListener('keydown', (e)=>{ if(e.key==='Backspace' && !caret.value){ if (draft.field){ draft.field=draft.type=draft.value=null; removeDraft(); setStage('field'); showX(); return; } if(state.filters.length){ state.filters.pop(); if(state.logicOps.length) state.logicOps.pop(); renderChips(); setPH(); showX(); emitChange(); } }});
         document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !dd.classList.contains('ff-hidden')) closeDD(); });

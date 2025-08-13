@@ -39,17 +39,4 @@ div.dataTables_wrapper .dataTables_filter input {
 .overflow-auto::-webkit-scrollbar {
   display: none;
 }
-/* เจาะจง search box ของ DataTables */
-.dataTables_filter input[type="search"] {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #862727;
-  width: 200px;
-  font-size: 14px;
-}
 
-/* ถ้าต้องการเอา label "Search:" ออก */
-.dataTables_filter label {
-  font-weight: normal;
-  color: #666;
-}

@@ -91,14 +91,6 @@ class TasksDataTable(BaseHandler):
 
         sorted_tasks_paginated = sorted_tasks[start:start + length]
 
-        # for task in sorted_tasks_paginated:
-        #     task_dict = as_dict(self.format_task(task)[1])
-        #     if task_dict.get('worker'):
-        #         task_dict['worker'] = task_dict['worker'].hostname
-        #     task_dict['service'] = 'test-service'
-        #     task_dict['upstream'] = 'test-upstream'
-        #     filtered_tasks.append(task_dict)
-
         task_ids = [task[0] for task in sorted_tasks_paginated]
         tasks_from_redis = self.application.redis_client.get_tasks_by_id(task_ids)
         tasks_from_redis_dict = []
@@ -120,18 +112,25 @@ class TasksDataTable(BaseHandler):
             filtered_tasks.append(task_dict)
 
         # filter tasks by search
-        if search:
-            search_data = search.lower().replace(" ", "").split(":", maxsplit=1)
-            if len(search_data) == 2:
-                kw_search, search_value = search_data
-            else:
-                kw_search = ""
-                search_value = ""
-            logger.debug(f"search: {search}")
-            logger.debug(f"kw_search: {kw_search}")
-            logger.debug(f"search_value: {search_value}")
-            if kw_search and search_value:
-                filtered_tasks = list(filter(lambda x: x[kw_search] == search_value, filtered_tasks))
+        if any([service_search, upstream_search, expired_search]):
+            # search_data = search.lower().replace(" ", "").split(":", maxsplit=1)
+            # if len(search_data) == 2:
+            #     kw_search, search_value = search_data
+            # else:
+            #     kw_search = ""
+            #     search_value = ""
+            # logger.debug(f"search: {search}")
+            # logger.debug(f"kw_search: {kw_search}")
+            # logger.debug(f"search_value: {search_value}")
+            if service_search:
+                logger.debug(f"Filtering tasks by service: {service_search}")
+                filtered_tasks = list(filter(lambda x: x['service'] == service_search, filtered_tasks))
+            if upstream_search:
+                logger.debug(f"Filtering tasks by upstream: {upstream_search}")
+                filtered_tasks = list(filter(lambda x: x['upstream'] == upstream_search, filtered_tasks))
+            if expired_search:
+                logger.debug(f"Filtering tasks by expired: {expired_search}")
+                filtered_tasks = list(filter(lambda x: x['expired'] == expired_search, filtered_tasks))
 
         self.write(dict(draw=draw, data=filtered_tasks,
                         recordsTotal=len(sorted_tasks),

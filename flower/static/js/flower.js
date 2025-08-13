@@ -540,7 +540,7 @@ var flower = (function () {
         $('#tasks-table').DataTable({
             rowId: 'uuid',
             searching: true,
-            dom: 'lrftip',
+            dom: 'lrtip',
             scrollX: true,
             scrollCollapse: true,
             processing: true,

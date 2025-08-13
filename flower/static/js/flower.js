@@ -726,10 +726,6 @@ var flower = (function () {
                 targets: 20,
                 data: 'email',
                 visible: isColumnVisible('email')
-            }, {
-                targets: 21,
-                data: 'operator',
-                visible: isColumnVisible('operator')
             }
         ],
         // initComplete: function () {

@@ -77,13 +77,9 @@
       // Filter component logic (scoped to tasks page)
       (() => {
         // Fields mapped to tasks table columns
-        // name(0), uuid(1), state(2), service(3), upstream(4), expired(5)
         const FIELDS = [
-          { key:"name",    label:"Name",    type:"text" },
-          { key:"uuid",    label:"UUID",    type:"text" },
-          { key:"state",   label:"State",   type:"enum", options:["PENDING","RECEIVED","STARTED","RETRY","FAILURE","SUCCESS","REVOKED"] },
-          { key:"service", label:"Service", type:"enum", options:["asr","yt2audio","stt-pro","gateway"] },
-          { key:"upstream",label:"Upstream",type:"text" },
+          { key:"service", label:"Service", type:"enum", options:["asr","yt2audio", "asr-pro"] },
+          { key:"upstream",label:"Upstream",type:"enum", options:["http://host.docker.internal:8000","http://host.docker.internal:8001", "http://host.docker.internal:8002"] },
           { key:"expired", label:"Expired", type:"enum", options:["true","false"] },
         ];
     

@@ -65,10 +65,12 @@ class TasksDataTable(BaseHandler):
         service_search = self.get_argument('columns[3][search][value]', type=str)
         upstream_search = self.get_argument('columns[4][search][value]', type=str)
         expired_search = self.get_argument('columns[5][search][value]', type=str)
+        email_search = self.get_argument('columns[20][search][value]', type=str)
 
         logger.debug(f"service_search: {service_search} with type {type(service_search)}")
         logger.debug(f"upstream_search: {upstream_search} with type {type(upstream_search)}")
         logger.debug(f"expired_search: {expired_search} with type {type(expired_search)}")
+        logger.debug(f"email_search: {email_search} with type {type(email_search)}")
 
         def key(item):
             return Comparable(getattr(item[1], sort_by))
@@ -112,7 +114,7 @@ class TasksDataTable(BaseHandler):
             filtered_tasks.append(task_dict)
 
         # filter tasks by search
-        if any([service_search, upstream_search, expired_search]):
+        if any([service_search, upstream_search, expired_search, email_search]):
             if service_search:
                 logger.debug(f"Filtering tasks by service: {service_search}")
                 filtered_tasks = list(filter(lambda x: x['service'] == service_search, filtered_tasks))
@@ -123,6 +125,9 @@ class TasksDataTable(BaseHandler):
                 expired_search = expired_search.lower()
                 logger.debug(f"Filtering tasks by expired: {expired_search}")
                 filtered_tasks = list(filter(lambda x: x['expired'] == expired_search, filtered_tasks))
+            if email_search:
+                logger.debug(f"Filtering tasks by email: {email_search}")
+                filtered_tasks = list(filter(lambda x: x['email'] == email_search, filtered_tasks))
 
         self.write(dict(draw=draw, data=filtered_tasks,
                         recordsTotal=len(sorted_tasks),

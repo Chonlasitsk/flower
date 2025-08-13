@@ -10,6 +10,70 @@
 <input type="hidden" value="{{ columns }}" id='columns'>
 
 <div class="container-fluid mt-3">
+  <!-- Filter component (scoped to tasks page) -->
+  <div id="ff-root" class="ff-root mb-3">
+    <div id="ff-box" class="ff-box" role="textbox" aria-label="Filter">
+      <span class="ff-icon">🔎</span>
+      <span id="ff-ph" class="ff-ph">Filter…</span>
+      <input id="ff-caret" class="ff-caret" autocomplete="off" />
+      <button id="ff-clear" class="ff-clear" aria-label="Clear all">✕</button>
+    </div>
+
+    <div id="ff-dd" class="ff-dd ff-hidden" role="dialog" aria-modal="true">
+      <div class="ff-crumbs">
+        <div id="ff-cField" class="ff-crumb ff-active">Field</div><div>›</div>
+        <div id="ff-cVal"   class="ff-crumb">Value</div>
+      </div>
+
+      <div id="ff-sField">
+        <div class="ff-label">Choose field</div>
+        <div id="ff-fList" class="ff-list"></div>
+      </div>
+
+      <div id="ff-sVal" class="ff-hidden">
+        <div class="ff-label">Enter value</div>
+        <div id="ff-vBox"></div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    :root{
+      --ff-text:#0f172a; --ff-muted:#64748b; --ff-surface:#ffffff; --ff-input:#f3f4f6; --ff-border:#e5e7eb; --ff-shadow:0 6px 24px rgba(2,6,23,.06);
+      --ff-green:#10b981; --ff-chip-bg:#ecfdf5; --ff-chip-brd:#a7f3d0; --ff-chip-fg:#065f46; --ff-ring:0 0 0 2px rgba(16,185,129,.35);
+    }
+    .ff-root{font:14px/1.45 "Inter","Roboto",system-ui,-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:var(--ff-text)}
+    *{box-sizing:border-box}
+    .ff-box{position:relative; display:flex; align-items:center; flex-wrap:wrap; gap:6px; min-height:42px; padding:6px 40px 6px 36px; border:1px solid var(--ff-border); border-radius:999px; background:var(--ff-surface); transition:box-shadow .12s,border-color .12s; cursor:text; box-shadow:var(--ff-shadow)}
+    .ff-box:focus-within{ box-shadow:var(--ff-ring), var(--ff-shadow); border-color:transparent }
+    .ff-icon{ position:absolute; left:12px; color:#94a3b8; pointer-events:none }
+    .ff-ph{ color:var(--ff-muted) }
+    .ff-caret{ flex:1; min-width:120px; height:28px; border:none; outline:none; background:transparent; color:var(--ff-text) }
+    .ff-clear{ position:absolute; right:6px; top:50%; transform:translateY(-50%); display:none; width:24px; height:24px; border:none; border-radius:50%; background:transparent; color:#94a3b8; cursor:pointer }
+    .ff-clear:hover{ background:var(--ff-input); color:var(--ff-text) }
+    .ff-chip{ display:inline-flex; align-items:center; gap:8px; height:28px; padding:0 10px; border-radius:999px; background:var(--ff-chip-bg); border:1px solid var(--ff-chip-brd); color:var(--ff-chip-fg); font-size:13px }
+    .ff-chip__label{ font-weight:600 }
+    .ff-chip__sep{ opacity:.8 }
+    .ff-chip__value{ color:var(--ff-chip-fg) }
+    .ff-chip .x{ width:18px; height:18px; border-radius:999px; border:none; display:inline-flex; align-items:center; justify-content:center; background:var(--ff-green); color:#fff; font-weight:900; font-size:12px; cursor:pointer }
+    .ff-chip .x:hover{ filter:brightness(1.05) }
+    .ff-draft{ display:inline-flex; align-items:center; gap:8px; height:28px; padding:0 10px; border-radius:999px; background:#f0fdf4; border:1px dashed var(--ff-chip-brd); color:var(--ff-chip-fg); font-size:13px }
+    .ff-draft .muted{ opacity:.7; color:var(--ff-chip-fg) }
+    .ff-op{ display:inline-flex; align-items:center; height:26px; padding:0 10px; border-radius:999px; border:1px solid var(--ff-border); background:var(--ff-input); color:var(--ff-muted); font-size:12px; cursor:pointer; user-select:none }
+    .ff-dd{ position:absolute; width:380px; max-width:calc(100vw - 32px); background:var(--ff-surface); border:1px solid var(--ff-border); border-radius:12px; box-shadow:var(--ff-shadow); padding:12px; z-index:999; overflow:hidden }
+    .ff-hidden{ display:none }
+    .ff-crumbs{ display:flex; gap:6px; align-items:center; font-size:13px; margin-bottom:6px; flex-wrap:wrap }
+    .ff-crumb{ padding:6px 10px; border:1px solid var(--ff-border); border-radius:999px; background:var(--ff-input); cursor:pointer; user-select:none }
+    .ff-active{ background:#ecfdf5; border-color:var(--ff-chip-brd) }
+    .ff-label{ font-size:12px; color:var(--ff-muted); margin:8px 0 }
+    .ff-list{ max-height:220px; overflow:auto; border:1px solid var(--ff-border); border-radius:10px; padding:4px; width:100%; background:#fff }
+    .ff-item{ padding:8px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center }
+    .ff-item:hover{ background:#f1f5f9 }
+    .ff-item[aria-selected="true"]{ background:#ecfdf5; border:1px solid var(--ff-chip-brd) }
+    .ff-input{ width:100%; height:36px; background:var(--ff-input); border:1px solid var(--ff-border); color:var(--ff-text); border-radius:8px; padding:0 12px; outline:none }
+    .ff-input:focus{ box-shadow:var(--ff-ring); border-color:transparent }
+  </style>
+
   <table id="tasks-table" class="table table-bordered table-striped table-hover w-100">
     <thead>
     <tr>

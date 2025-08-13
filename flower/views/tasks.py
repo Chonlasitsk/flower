@@ -108,20 +108,11 @@ class TasksDataTable(BaseHandler):
             task_dict['service'] = tasks_from_redis_dict[idx].get('service', None) if tasks_from_redis_dict[idx] else None
             task_dict['upstream'] = tasks_from_redis_dict[idx].get('upstream_url', None) if tasks_from_redis_dict[idx] else None
             task_dict['email'] = tasks_from_redis_dict[idx].get('email', None) if tasks_from_redis_dict[idx] else None
-            task_dict['expired'] = "No" if task_ttls[idx] > 0 else "Yes"
+            task_dict['expired'] = "False" if task_ttls[idx] > 0 else "True"
             filtered_tasks.append(task_dict)
 
         # filter tasks by search
         if any([service_search, upstream_search, expired_search]):
-            # search_data = search.lower().replace(" ", "").split(":", maxsplit=1)
-            # if len(search_data) == 2:
-            #     kw_search, search_value = search_data
-            # else:
-            #     kw_search = ""
-            #     search_value = ""
-            # logger.debug(f"search: {search}")
-            # logger.debug(f"kw_search: {kw_search}")
-            # logger.debug(f"search_value: {search_value}")
             if service_search:
                 logger.debug(f"Filtering tasks by service: {service_search}")
                 filtered_tasks = list(filter(lambda x: x['service'] == service_search, filtered_tasks))
@@ -129,6 +120,7 @@ class TasksDataTable(BaseHandler):
                 logger.debug(f"Filtering tasks by upstream: {upstream_search}")
                 filtered_tasks = list(filter(lambda x: x['upstream'] == upstream_search, filtered_tasks))
             if expired_search:
+                expired_search = expired_search.lower()
                 logger.debug(f"Filtering tasks by expired: {expired_search}")
                 filtered_tasks = list(filter(lambda x: x['expired'] == expired_search, filtered_tasks))
 

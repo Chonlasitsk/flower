@@ -722,7 +722,15 @@ var flower = (function () {
                 targets: 19,
                 data: 'eta',
                 visible: isColumnVisible('eta')
-            }, 
+            }, {
+                targets: 20,
+                data: 'email',
+                visible: isColumnVisible('email')
+            }, {
+                targets: 21,
+                data: 'operator',
+                visible: isColumnVisible('operator')
+            }
         ],
         // initComplete: function () {
         //     const stateFilter = $.urlParam('state');

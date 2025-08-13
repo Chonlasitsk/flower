@@ -64,7 +64,7 @@ class TasksDataTable(BaseHandler):
 
         service_search = self.get_argument('columns[3][search][value]', type=str)
         upstream_search = self.get_argument('columns[4][search][value]', type=str)
-        expired_search = self.get_argument('columns[5][search][value]', type=bool)
+        expired_search = self.get_argument('columns[5][search][value]', type=str)
 
         logger.debug(f"service_search: {service_search} with type {type(service_search)}")
         logger.debug(f"upstream_search: {upstream_search} with type {type(upstream_search)}")

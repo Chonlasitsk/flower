@@ -172,7 +172,7 @@
             const idx = fieldToColumn[f.field];
             if (idx === undefined) return;
             if (f.type === 'enum') {
-              api.column(idx).search('^' + (f.value||'') + '$', true, false);
+              api.column(idx).search(f.value||'', true, false);
             } else {
               api.column(idx).search(String(f.value||''), false, true);
             }

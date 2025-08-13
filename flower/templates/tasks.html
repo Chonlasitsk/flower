@@ -78,6 +78,7 @@
       (() => {
         // Fields mapped to tasks table columns
         const FIELDS = [
+          { key:"state",   label:"State",  type:"enum", options:["PENDING","RECEIVED","STARTED","RETRY","FAILURE","SUCCESS","REVOKED"] },
           { key:"service", label:"Service", type:"enum", options:["asr","yt2audio", "asr-pro"] },
           { key:"upstream",label:"Upstream",type:"enum", options:["http://host.docker.internal:8000","http://host.docker.internal:8001", "http://host.docker.internal:8002"] },
           { key:"expired", label:"Expired", type:"enum", options:["true","false"] },
